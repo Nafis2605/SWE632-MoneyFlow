@@ -18,6 +18,9 @@ function IncomeInput({ income, onIncomeChange }) {
     }
   }
 
+  // Validation check: button is disabled if input is empty or invalid
+  const isDisabled = !inputValue.trim() || isNaN(parseFloat(inputValue)) || parseFloat(inputValue) < 0
+
   return (
     <section className="income-input-section">
       <h2>Monthly Income</h2>
@@ -35,11 +38,17 @@ function IncomeInput({ income, onIncomeChange }) {
               step="0.01"
               min="0"
               className="income-input"
+              aria-label="Monthly income amount"
             />
           </div>
-          {error && <p className="error-message">{error}</p>}
+          {error && <p className="error-message" role="alert">{error}</p>}
         </div>
-        <button type="submit" className="btn btn-primary">
+        <button 
+          type="submit" 
+          className="btn btn-primary"
+          disabled={isDisabled}
+          aria-disabled={isDisabled}
+        >
           Set Income
         </button>
       </form>

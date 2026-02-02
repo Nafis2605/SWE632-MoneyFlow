@@ -33,17 +33,27 @@
   border: 1px solid var(--color-border);
   border-radius: var(--border-radius);
   font-size: 1.125rem;
-  transition: all 0.2s ease;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .income-input:focus {
   outline: none;
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(249, 65, 68, 0.1);
+  box-shadow: 0 0 0 3px rgba(83, 103, 171, 0.1);
+}
+
+.income-form .error-message {
+  color: var(--color-primary);
+  font-size: 0.875rem;
+  margin: var(--spacing-sm) 0 0 0;
+  padding: var(--spacing-sm);
+  background-color: #fef2f2;
+  border-radius: var(--border-radius);
+  border-left: 3px solid var(--color-primary);
 }
 
 .income-form .btn-primary {
-  margin-top: var(--spacing-sm);
+  margin-top: var(--spacing-md);
 }
 
 @media (max-width: 768px) {

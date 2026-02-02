@@ -19,6 +19,13 @@ function ExpenseForm({ onAddExpense }) {
     }
   }
 
+  // Validation check: button is disabled if inputs are empty or invalid
+  const isDisabled = 
+    !name.trim() || 
+    !amount.trim() || 
+    isNaN(parseFloat(amount)) || 
+    parseFloat(amount) < 0
+
   return (
     <section className="expense-form-section">
       <h2>Add Expense</h2>
@@ -33,6 +40,7 @@ function ExpenseForm({ onAddExpense }) {
             placeholder="e.g., Groceries, Rent, Utilities"
             className="form-input"
             maxLength="100"
+            aria-label="Expense name or description"
           />
         </div>
 
@@ -49,13 +57,19 @@ function ExpenseForm({ onAddExpense }) {
               step="0.01"
               min="0"
               className="form-input"
+              aria-label="Expense amount"
             />
           </div>
         </div>
 
-        {error && <p className="error-message">{error}</p>}
+        {error && <p className="error-message" role="alert">{error}</p>}
 
-        <button type="submit" className="btn btn-primary">
+        <button 
+          type="submit" 
+          className="btn btn-primary"
+          disabled={isDisabled}
+          aria-disabled={isDisabled}
+        >
           Add Expense
         </button>
       </form>

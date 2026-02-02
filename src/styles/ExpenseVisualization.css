@@ -16,12 +16,13 @@
 .empty-state {
   text-align: center;
   padding: var(--spacing-xl);
-  color: #999;
+  color: #666;
 }
 
 .empty-state p {
   margin: 0;
   font-size: 1rem;
+  line-height: 1.5;
 }
 
 /* Charts Container */
