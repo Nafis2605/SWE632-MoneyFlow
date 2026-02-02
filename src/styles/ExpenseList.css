@@ -1,0 +1,90 @@
+.expense-list-section {
+  padding: var(--spacing-lg);
+}
+
+.expense-list-section h2 {
+  font-size: 1.5rem;
+  color: var(--color-dark);
+  margin-bottom: var(--spacing-lg);
+  font-weight: 600;
+}
+
+.expenses-container {
+  overflow: hidden;
+}
+
+.expenses-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.expense-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-md);
+  border-bottom: 1px solid #eee;
+  gap: var(--spacing-md);
+  transition: background-color 0.2s ease;
+}
+
+.expense-item:hover {
+  background-color: #fafafa;
+}
+
+.expense-item:last-child {
+  border-bottom: none;
+}
+
+.expense-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  gap: var(--spacing-md);
+}
+
+.expense-name {
+  font-weight: 500;
+  color: var(--color-dark);
+  flex: 1;
+  word-break: break-word;
+}
+
+.expense-amount {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--color-warning);
+  white-space: nowrap;
+}
+
+.empty-state {
+  text-align: center;
+  color: #999;
+  padding: var(--spacing-xl) var(--spacing-lg);
+  font-style: italic;
+}
+
+@media (max-width: 768px) {
+  .expense-list-section {
+    padding: var(--spacing-md);
+  }
+
+  .expense-list-section h2 {
+    font-size: 1.25rem;
+  }
+
+  .expense-item {
+    padding: var(--spacing-sm) var(--spacing-md);
+  }
+
+  .expense-content {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .expense-amount {
+    align-self: flex-end;
+  }
+}
