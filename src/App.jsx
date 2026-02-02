@@ -4,6 +4,7 @@ import IncomeInput from './components/IncomeInput'
 import ExpenseForm from './components/ExpenseForm'
 import ExpenseList from './components/ExpenseList'
 import BudgetSummary from './components/BudgetSummary'
+import ExpenseVisualization from './components/ExpenseVisualization'
 import './styles/App.css'
 
 function App() {
@@ -55,6 +56,15 @@ function App() {
               />
             </div>
           </section>
+        </div>
+
+        {/* Full Width: Expense Visualization */}
+        <div className="visualization-container">
+          <div className="section-wrapper">
+            <ExpenseVisualization
+              expenses={budgetState.expenses}
+            />
+          </div>
         </div>
       </main>
     </div>

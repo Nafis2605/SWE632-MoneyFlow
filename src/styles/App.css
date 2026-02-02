@@ -71,6 +71,13 @@
   gap: var(--spacing-lg);
 }
 
+/* Visualization Container */
+.visualization-container {
+  max-width: 1400px;
+  margin: var(--spacing-xl) auto 0;
+  width: 100%;
+}
+
 .section-column {
   display: flex;
   flex-direction: column;
