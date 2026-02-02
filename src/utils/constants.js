@@ -2,10 +2,11 @@
  * Color palette constants for the MoneyFlow application
  */
 export const COLORS = {
-  primary: '#f94144',      // Red
+  primary: '#5367AB',      // Blue
   warning: '#f9c74f',      // Yellow/Gold
   success: '#008000',      // Green
-  light: '#f8f9fa'         // Light Gray
+  light: '#ffffff',        // White
+  background: '#ffffff'    // White Background
 }
 
 /**

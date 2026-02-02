@@ -1,8 +1,8 @@
 :root {
-  --color-primary: #f94144;
+  --color-primary: #5367AB;
   --color-warning: #f9c74f;
   --color-success: #008000;
-  --color-light: #f8f9fa;
+  --color-light: #ffffff;
   --color-dark: #333;
   --color-border: #ddd;
   
@@ -34,7 +34,7 @@ html, body, #root {
 
 body {
   font-family: var(--font-family);
-  background-color: var(--color-light);
+  background-color: #ffffff;
   color: var(--color-dark);
   line-height: 1.6;
 }
