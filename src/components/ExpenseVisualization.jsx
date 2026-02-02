@@ -1,29 +1,12 @@
 import { PieChart, Pie, Cell, Legend, Tooltip, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts'
 import '../styles/ExpenseVisualization.css'
+import { preparePieChartData, prepareBarChartData, calculateExpenseStats } from '../utils/chartUtils'
 
 function ExpenseVisualization({ expenses }) {
-  // Color palette for charts
-  const COLORS = ['#5367AB', '#f9c74f', '#008000', '#ff6b6b', '#4ecdc4', '#45b7d1', '#f7b731', '#5f27cd']
-
-  // Prepare data for pie chart
-  const pieData = expenses.map((expense, index) => ({
-    name: expense.name,
-    value: expense.amount,
-    color: COLORS[index % COLORS.length]
-  }))
-
-  // Prepare data for bar chart (top expenses)
-  const barData = [...expenses]
-    .sort((a, b) => b.amount - a.amount)
-    .slice(0, 10)
-    .map((expense, index) => ({
-      name: expense.name.length > 12 ? expense.name.substring(0, 12) + '...' : expense.name,
-      amount: expense.amount,
-      fullName: expense.name
-    }))
-
-  // Calculate total for percentage display
-  const totalExpenses = expenses.reduce((sum, expense) => sum + expense.amount, 0)
+  // Prepare data for charts
+  const pieData = preparePieChartData(expenses)
+  const barData = prepareBarChartData(expenses)
+  const stats = calculateExpenseStats(expenses)
 
   if (expenses.length === 0) {
     return (
@@ -109,19 +92,19 @@ function ExpenseVisualization({ expenses }) {
       <div className="visualization-stats">
         <div className="stat-item">
           <span className="stat-label">Total Expenses:</span>
-          <span className="stat-value">${totalExpenses.toFixed(2)}</span>
+          <span className="stat-value">${stats.total.toFixed(2)}</span>
         </div>
         <div className="stat-item">
           <span className="stat-label">Number of Expenses:</span>
-          <span className="stat-value">{expenses.length}</span>
+          <span className="stat-value">{stats.count}</span>
         </div>
         <div className="stat-item">
           <span className="stat-label">Average Expense:</span>
-          <span className="stat-value">${(totalExpenses / expenses.length).toFixed(2)}</span>
+          <span className="stat-value">${stats.average.toFixed(2)}</span>
         </div>
         <div className="stat-item">
           <span className="stat-label">Highest Expense:</span>
-          <span className="stat-value">${Math.max(...expenses.map(e => e.amount)).toFixed(2)}</span>
+          <span className="stat-value">${stats.highest.toFixed(2)}</span>
         </div>
       </div>
     </section>

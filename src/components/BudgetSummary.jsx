@@ -1,8 +1,10 @@
 import '../styles/BudgetSummary.css'
+import { calculateBudgetPercentage, isOverBudget, getOverBudgetAmount } from '../utils/budgetCalculations'
 
 function BudgetSummary({ income, totalExpenses, remainingBudget }) {
-  const percentage = income > 0 ? (totalExpenses / income) * 100 : 0
-  const isOverBudget = remainingBudget < 0
+  const percentage = calculateBudgetPercentage(totalExpenses, income)
+  const overBudget = isOverBudget(remainingBudget)
+  const overAmount = getOverBudgetAmount(remainingBudget)
 
   return (
     <section className="budget-summary-section">
@@ -21,7 +23,7 @@ function BudgetSummary({ income, totalExpenses, remainingBudget }) {
 
         <div className="summary-card">
           <h3>Remaining</h3>
-          <p className={`amount ${isOverBudget ? 'over-budget' : 'remaining'}`}>
+          <p className={`amount ${overBudget ? 'over-budget' : 'remaining'}`}>
             ${remainingBudget.toFixed(2)}
           </p>
         </div>
@@ -39,9 +41,9 @@ function BudgetSummary({ income, totalExpenses, remainingBudget }) {
             style={{ width: `${Math.min(percentage, 100)}%` }}
           />
         </div>
-        {isOverBudget && (
+        {overBudget && (
           <p className="warning-text">
-            ⚠️ You've exceeded your budget by ${Math.abs(remainingBudget).toFixed(2)}
+            ⚠️ You've exceeded your budget by ${overAmount.toFixed(2)}
           </p>
         )}
       </div>
