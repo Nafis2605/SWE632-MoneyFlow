@@ -132,35 +132,7 @@ npm run build
 npm run preview
 ```
 
-## Code Architecture
-
-### Single Responsibility Principle
-Each component handles one specific responsibility:
-- **IncomeInput** - Only handles income input
-- **ExpenseForm** - Only handles adding new expenses
-- **ExpenseList** - Only displays and deletes expenses
-- **BudgetSummary** - Only shows budget overview
-- **ExpenseVisualization** - Only displays charts
-
-### Data Flow
-```
-App (State Management via useBudgetState)
-├── IncomeInput (set income)
-├── ExpenseForm (add expenses)
-├── ExpenseList (delete expenses)
-├── BudgetSummary (display summary)
-└── ExpenseVisualization (show charts)
-```
-
-### State Management
-- **useBudgetState hook** - Centralized state management for all budget data
-- **Immutable updates** - All state changes create new arrays/objects
-- **Computed values** - totalExpenses and remainingBudget calculated automatically
-
-### Validation
-- **Model layer** - `budgetModels.js` handles all validation logic
-- **Component layer** - Components disable buttons for invalid inputs
-- **User feedback** - Clear error messages with visual styling
+See [ARCHITECTURE.md](ARCHITECTURE.md) for detailed code architecture documentation.
 
 ## Color Palette
 
