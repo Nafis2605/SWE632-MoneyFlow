@@ -1,3 +1,5 @@
+This project is live at https://moneyflow-swe632.netlify.app/
+
 # MoneyFlow - Personal Budget Planner
 
 A modern, responsive budget planning application built with React and Vite. MoneyFlow helps users manage their monthly income, track expenses, and visualize their spending patterns with an intuitive interface.
