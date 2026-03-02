@@ -60,14 +60,14 @@ function ExpenseVisualization({ expenses }) {
         <div className="chart-wrapper bar-chart-wrapper">
           <h3>Top Expenses</h3>
           <ResponsiveContainer width="100%" height={350}>
-            <BarChart data={barData} margin={{ top: 20, right: 30, left: 20, bottom: 60 }}>
+            <BarChart data={barData} margin={{ top: 20, right: 30, left: 20, bottom: 50 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#eee" />
               <XAxis 
                 dataKey="name" 
-                angle={-45}
-                textAnchor="end"
-                height={100}
-                tick={{ fontSize: 12 }}
+                height={50}
+                tick={{ fontSize: 11 }}
+                interval={0}
+                tickFormatter={(value) => value.length > 12 ? value.substring(0, 12) + '...' : value}
               />
               <YAxis 
                 label={{ value: 'Amount ($)', angle: -90, position: 'insideLeft' }}
@@ -79,10 +79,13 @@ function ExpenseVisualization({ expenses }) {
               />
               <Bar 
                 dataKey="amount" 
-                fill="#dc2626"
                 radius={[8, 8, 0, 0]}
                 animationDuration={300}
-              />
+              >
+                {barData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={entry.color} />
+                ))}
+              </Bar>
             </BarChart>
           </ResponsiveContainer>
         </div>

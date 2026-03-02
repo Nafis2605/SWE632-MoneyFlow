@@ -19,6 +19,10 @@
   min-height: 400px;
 }
 
+.transactions-section {
+  margin-top: var(--spacing-xl);
+}
+
 .section-wrapper {
   background: white;
   border-radius: 12px;

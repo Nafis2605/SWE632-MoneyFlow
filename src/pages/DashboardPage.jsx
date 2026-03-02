@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import ExpenseVisualization from '../components/ExpenseVisualization'
 import BudgetSummary from '../components/BudgetSummary'
 import FiltersPanel from '../components/FiltersPanel'
+import TransactionListWithActions from '../components/TransactionListWithActions'
 import { getDefaultFilters, applyFilters } from '../utils/filterModel'
 import '../styles/DashboardPage.css'
 
@@ -64,6 +65,19 @@ function DashboardPage({ budgetState }) {
                 expenses={filteredExpenses}
               />
             )}
+          </div>
+        </div>
+
+        {/* Transactions List with Edit/Delete */}
+        <div className="dashboard-section transactions-section">
+          <div className="section-wrapper">
+            <h2>Filtered Transactions</h2>
+            <TransactionListWithActions
+              transactions={filteredTransactions}
+              onDelete={budgetState.deleteTransaction}
+              onUpdate={budgetState.updateTransaction}
+              emptyMessage="No transactions match your filter. Try adjusting the date range or filter type."
+            />
           </div>
         </div>
       </div>

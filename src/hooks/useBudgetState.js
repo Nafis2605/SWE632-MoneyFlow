@@ -64,9 +64,15 @@ export const useBudgetState = () => {
   /**
    * Update an existing transaction
    * Creates immutable copy of transactions array with updated item
+   * @param {string} id - Transaction ID
+   * @param {string} description - Transaction description
+   * @param {string} category - Transaction category
+   * @param {number} amount - Transaction amount
+   * @param {string} dateISO - ISO date string
+   * @returns {Object} Result object with success status
    */
-  const updateTransaction = useCallback((id, title, amount) => {
-    const validation = validateTransaction(title, amount)
+  const updateTransaction = useCallback((id, description, category, amount, dateISO) => {
+    const validation = validateTransaction(description, amount)
     if (!validation.isValid) {
       return { success: false, errors: validation.errors }
     }
@@ -74,7 +80,13 @@ export const useBudgetState = () => {
     setTransactions(prevTransactions =>
       prevTransactions.map(transaction =>
         transaction.id === id
-          ? { ...transaction, title: title.trim(), amount: Math.max(0, parseFloat(amount)) }
+          ? { 
+              ...transaction, 
+              description: description.trim(), 
+              category: category || transaction.category,
+              amount: Math.max(0, parseFloat(amount)),
+              dateISO: dateISO || transaction.dateISO
+            }
           : transaction
       )
     )

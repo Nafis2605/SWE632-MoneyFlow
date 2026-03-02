@@ -369,3 +369,274 @@ export const downloadTransactionPDF = (transactions, summary, filename = 'transa
     alert('An error occurred while generating the PDF. Please try again.')
   }
 }
+
+/**
+ * Generate enhanced PDF with charts and visualizations
+ * @param {Transaction[]} transactions - Array of transactions to export
+ * @param {Object} summary - Summary object with report data
+ * @param {string} filterInfo - Filter information string
+ * @param {Object} chartImages - Object containing base64 chart images {pieChart, barChart}
+ * @returns {jsPDF} PDF document object
+ */
+export const generateEnhancedTransactionPDF = (transactions, summary, filterInfo = '', chartImages = {}) => {
+  const doc = new jsPDF()
+  const pageWidth = doc.internal.pageSize.getWidth()
+  const pageHeight = doc.internal.pageSize.getHeight()
+  const margin = 15
+  const lineHeight = 7
+  let yPosition = margin
+
+  // PRIMARY COLOR
+  const primaryColor = [83, 103, 171] // #5367AB
+  const textDarkColor = [51, 51, 51]
+  const textLightColor = [102, 102, 102]
+
+  // ===== TITLE SECTION =====
+  doc.setFontSize(24)
+  doc.setFont(undefined, 'bold')
+  doc.setTextColor(...textDarkColor)
+  doc.text('Financial Report', margin, yPosition)
+  yPosition += 12
+
+  // Date and Filter Info
+  doc.setFontSize(10)
+  doc.setFont(undefined, 'normal')
+  doc.setTextColor(...textLightColor)
+  const reportDate = new Date().toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  })
+  doc.text(`Generated: ${reportDate}`, margin, yPosition)
+  yPosition += 6
+
+  if (filterInfo) {
+    doc.setFont(undefined, 'italic')
+    doc.text(`Date Range: ${filterInfo}`, margin, yPosition)
+    yPosition += 6
+  }
+
+  yPosition += 4
+
+  // ===== SUMMARY SECTION =====
+  doc.setDrawColor(...primaryColor)
+  doc.setLineWidth(0.5)
+  doc.line(margin, yPosition, pageWidth - margin, yPosition)
+  yPosition += 4
+
+  doc.setFontSize(13)
+  doc.setFont(undefined, 'bold')
+  doc.setTextColor(...primaryColor)
+  doc.text('Summary', margin, yPosition)
+  yPosition += 8
+
+  // Summary data in two columns
+  doc.setFontSize(10)
+  doc.setFont(undefined, 'normal')
+  doc.setTextColor(...textDarkColor)
+
+  const summaryData = [
+    { label: 'Total Income', value: `$${summary.totalIncome.toFixed(2)}` },
+    { label: 'Total Expenses', value: `$${summary.totalExpenses.toFixed(2)}` },
+    { label: 'Net Balance', value: `$${summary.netBalance.toFixed(2)}` }
+  ]
+
+  const advancedData = [
+    { label: 'Transactions', value: `${summary.transactionCount}` },
+    { label: 'Expense Ratio', value: `${summary.expenseRatio.toFixed(1)}%` },
+    { label: 'Savings Rate', value: `${summary.savingsRate.toFixed(1)}%` }
+  ]
+
+  const leftColX = margin
+  const rightColX = pageWidth / 2 + 5
+
+  summaryData.forEach((item, index) => {
+    doc.setFont(undefined, 'bold')
+    doc.text(item.label + ':', leftColX, yPosition)
+    doc.setFont(undefined, 'normal')
+    doc.text(item.value, leftColX + 40, yPosition)
+
+    doc.setFont(undefined, 'bold')
+    doc.text(advancedData[index].label + ':', rightColX, yPosition)
+    doc.setFont(undefined, 'normal')
+    doc.text(advancedData[index].value, rightColX + 40, yPosition)
+
+    yPosition += lineHeight + 1
+  })
+
+  yPosition += 5
+
+  // ===== CHARTS SECTION =====
+  if (chartImages.pieChart || chartImages.barChart) {
+    // Check if we need new page
+    if (yPosition > pageHeight - 100) {
+      doc.addPage()
+      yPosition = margin
+    }
+
+    doc.setDrawColor(...primaryColor)
+    doc.setLineWidth(0.5)
+    doc.line(margin, yPosition, pageWidth - margin, yPosition)
+    yPosition += 4
+
+    doc.setFontSize(13)
+    doc.setFont(undefined, 'bold')
+    doc.setTextColor(...primaryColor)
+    doc.text('Visualizations', margin, yPosition)
+    yPosition += 8
+
+    const chartWidth = (pageWidth - margin * 2) / 2 - 5
+    const chartHeight = 60
+
+    // Pie Chart
+    if (chartImages.pieChart) {
+      doc.setFontSize(11)
+      doc.setFont(undefined, 'bold')
+      doc.setTextColor(...textDarkColor)
+      doc.text('Expense Breakdown', margin, yPosition)
+      yPosition += 3
+
+      try {
+        doc.addImage(chartImages.pieChart, 'PNG', margin, yPosition, chartWidth, chartHeight)
+      } catch (error) {
+        console.error('Error adding pie chart:', error)
+        doc.setTextColor(255, 0, 0)
+        doc.setFontSize(9)
+        doc.text('Chart could not be added', margin, yPosition)
+      }
+    }
+
+    // Bar Chart
+    if (chartImages.barChart) {
+      const barChartX = margin + chartWidth + 10
+      
+      doc.setFontSize(11)
+      doc.setFont(undefined, 'bold')
+      doc.setTextColor(...textDarkColor)
+      doc.text('Top Expenses', barChartX, yPosition)
+      yPosition += 3
+
+      try {
+        doc.addImage(chartImages.barChart, 'PNG', barChartX, yPosition, chartWidth, chartHeight)
+      } catch (error) {
+        console.error('Error adding bar chart:', error)
+        doc.setTextColor(255, 0, 0)
+        doc.setFontSize(9)
+        doc.text('Chart could not be added', barChartX, yPosition)
+      }
+    }
+
+    yPosition += chartHeight + 10
+  }
+
+  // Check if we need a new page for transactions
+  if (yPosition > pageHeight - 50) {
+    doc.addPage()
+    yPosition = margin
+  }
+
+  // ===== TRANSACTIONS SECTION =====
+  doc.setDrawColor(...primaryColor)
+  doc.setLineWidth(0.5)
+  doc.line(margin, yPosition, pageWidth - margin, yPosition)
+  yPosition += 4
+
+  doc.setFontSize(13)
+  doc.setFont(undefined, 'bold')
+  doc.setTextColor(...primaryColor)
+  doc.text('Transaction Details', margin, yPosition)
+  yPosition += 8
+
+  // Table headers with background
+  doc.setFillColor(240, 242, 248) // Light blue background
+  doc.setDrawColor(...primaryColor)
+  doc.rect(margin, yPosition - 5, pageWidth - margin * 2, lineHeight + 2, 'F')
+
+  doc.setFontSize(9)
+  doc.setFont(undefined, 'bold')
+  doc.setTextColor(...primaryColor)
+
+  const colDate = margin + 2
+  const colTitle = margin + 35
+  const colType = margin + 95
+  const colAmount = pageWidth - margin - 30
+
+  doc.text('Date', colDate, yPosition)
+  doc.text('Description', colTitle, yPosition)
+  doc.text('Type', colType, yPosition)
+  doc.text('Amount', colAmount, yPosition)
+  yPosition += lineHeight + 4
+
+  // Table data
+  doc.setFont(undefined, 'normal')
+  doc.setFontSize(9)
+  doc.setTextColor(...textDarkColor)
+
+  transactions.forEach((transaction) => {
+    if (yPosition > pageHeight - 15) {
+      doc.addPage()
+      yPosition = margin
+
+      // Repeat headers
+      doc.setFillColor(240, 242, 248)
+      doc.setDrawColor(...primaryColor)
+      doc.rect(margin, yPosition - 5, pageWidth - margin * 2, lineHeight + 2, 'F')
+      doc.setFont(undefined, 'bold')
+      doc.setTextColor(...primaryColor)
+      doc.text('Date', colDate, yPosition)
+      doc.text('Description', colTitle, yPosition)
+      doc.text('Type', colType, yPosition)
+      doc.text('Amount', colAmount, yPosition)
+      yPosition += lineHeight + 4
+      doc.setFont(undefined, 'normal')
+      doc.setTextColor(...textDarkColor)
+    }
+
+    const date = formatDate(transaction.dateISO)
+    const type = transaction.type.charAt(0).toUpperCase() + transaction.type.slice(1)
+    const amount = `$${transaction.amount.toFixed(2)}`
+
+    // Alternate row color
+    if (Math.floor((transactions.indexOf(transaction) % 2)) === 0) {
+      doc.setFillColor(248, 249, 250)
+      doc.rect(margin, yPosition - 5, pageWidth - margin * 2, lineHeight + 1, 'F')
+    }
+
+    const wrappedTitle = doc.splitTextToSize(transaction.description, 55)
+
+    doc.text(date, colDate, yPosition)
+    doc.text(wrappedTitle, colTitle, yPosition)
+    doc.text(type, colType, yPosition)
+    doc.text(amount, colAmount, yPosition)
+
+    yPosition += lineHeight * Math.max(wrappedTitle.length, 1) + 1
+  })
+
+  // Footer
+  yPosition = pageHeight - 10
+  doc.setFontSize(8)
+  doc.setTextColor(150)
+  doc.text(`Page ${doc.internal.pages.length - 1} of ${doc.internal.pages.length - 1}`, margin, yPosition)
+  const footerText = 'MoneyFlow Financial Report'
+  doc.text(footerText, pageWidth - margin - doc.getTextWidth(footerText), yPosition)
+
+  return doc
+}
+
+/**
+ * Download enhanced PDF with charts
+ * @param {Transaction[]} transactions - Array of transactions
+ * @param {Object} summary - Summary data
+ * @param {string} filename - Filename for download
+ * @param {string} filterInfo - Filter information
+ * @param {Object} chartImages - Chart images
+ */
+export const downloadEnhancedTransactionPDF = (transactions, summary, filename = 'transactions.pdf', filterInfo = '', chartImages = {}) => {
+  try {
+    const pdf = generateEnhancedTransactionPDF(transactions, summary, filterInfo, chartImages)
+    pdf.save(filename)
+  } catch (error) {
+    console.error('Error generating enhanced PDF:', error)
+    alert('An error occurred while generating the PDF. Please try again.')
+  }
+}

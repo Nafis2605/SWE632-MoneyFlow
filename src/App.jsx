@@ -23,11 +23,11 @@ function App() {
           />
           <Route 
             path="/transactions" 
-            element={<TransactionsPage transactions={budgetState.transactions} />} 
+            element={<TransactionsPage budgetState={budgetState} />} 
           />
           <Route 
             path="/reports" 
-            element={<ReportsPage transactions={budgetState.transactions} />} 
+            element={<ReportsPage budgetState={budgetState} />} 
           />
         </Routes>
       </div>

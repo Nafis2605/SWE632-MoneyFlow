@@ -1,14 +1,19 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import '../styles/ReportsPage.css'
 import { getTodayISO, formatMonthYear } from '../utils/date'
-import { getSortedTransactions, downloadTransactionCSV, downloadTransactionPDF } from '../utils/helpers'
+import { getSortedTransactions, downloadTransactionCSV, downloadTransactionPDF, downloadEnhancedTransactionPDF } from '../utils/helpers'
 import FiltersPanel from '../components/FiltersPanel'
+import TransactionListWithActions from '../components/TransactionListWithActions'
+import ExpenseVisualization from '../components/ExpenseVisualization'
 import { getDefaultFilters, applyFilters } from '../utils/filterModel'
 import { calculateBudgetSummary } from '../utils/budgetCalculations'
+import { captureChartsAsImages } from '../utils/chartExport'
 
-function ReportsPage({ transactions }) {
+function ReportsPage({ budgetState }) {
   const [filters, setFilters] = useState(getDefaultFilters())
+  const pieChartRef = useRef(null)
+  const transactions = budgetState.transactions
 
   // Apply filters and get filtered transactions
   const filteredTransactions = getSortedTransactions(applyFilters(transactions, filters))
@@ -60,7 +65,7 @@ function ReportsPage({ transactions }) {
     downloadTransactionCSV(filteredTransactions, `${generateFileName()}.csv`)
   }
 
-  const handleExportPDF = () => {
+  const handleExportPDF = async () => {
     if (filteredTransactions.length === 0) {
       alert('No transactions to export')
       return
@@ -74,8 +79,19 @@ function ReportsPage({ transactions }) {
       expenseRatio: balancePercentage,
       savingsRate: totalIncome > 0 ? (((totalIncome - totalExpenses) / totalIncome) * 100) : 0
     }
+
+    // Capture charts if they exist
+    const chartImages = {}
+    try {
+      const capturedImages = await captureChartsAsImages({
+        pieChart: pieChartRef.current
+      })
+      if (capturedImages.pieChart) chartImages.pieChart = capturedImages.pieChart
+    } catch (error) {
+      console.warn('Could not capture charts for PDF:', error)
+    }
     
-    downloadTransactionPDF(filteredTransactions, summaryData, `${generateFileName()}.pdf`, generateFilterInfo())
+    downloadEnhancedTransactionPDF(filteredTransactions, summaryData, `${generateFileName()}.pdf`, generateFilterInfo(), chartImages)
   }
 
   return (
@@ -187,6 +203,13 @@ function ReportsPage({ transactions }) {
                 </div>
               </div>
 
+              {/* Charts Section - Only show if there are expenses */}
+              {expenseTransactions.length > 0 && (
+                <div ref={pieChartRef} style={{marginBottom: '2rem'}}>
+                  <ExpenseVisualization expenses={expenseTransactions} />
+                </div>
+              )}
+
               {/* Summary Table */}
               <div className="summary-table">
                 <h3>Detailed Breakdown</h3>
@@ -208,6 +231,17 @@ function ReportsPage({ transactions }) {
                     </tr>
                   </tbody>
                 </table>
+              </div>
+
+              {/* Filtered Transactions List */}
+              <div className="transactions-detail-section">
+                <h3>Transaction Details</h3>
+                <TransactionListWithActions
+                  transactions={filteredTransactions}
+                  onDelete={budgetState.deleteTransaction}
+                  onUpdate={budgetState.updateTransaction}
+                  emptyMessage="No transactions to display for the selected filter."
+                />
               </div>
             </>
           )}

@@ -41,6 +41,8 @@ function HomePage({ budgetState }) {
         <div className="section-wrapper">
           <RecentTransactions
             transactions={budgetState.transactions}
+            onDeleteTransaction={budgetState.deleteTransaction}
+            onUpdateTransaction={budgetState.updateTransaction}
           />
         </div>
       </div>

@@ -6,6 +6,7 @@
  */
 
 import { groupExpensesByCategory } from './aggregate'
+import { getCategoryColor } from './categoryColors'
 
 /**
  * Semantic transaction colors for consistency across the app
@@ -34,10 +35,10 @@ export const CHART_COLORS = [
 export const preparePieChartData = (expenses) => {
   const aggregated = groupExpensesByCategory(expenses)
   
-  return aggregated.map((item, index) => ({
+  return aggregated.map((item) => ({
     name: item.label,
     value: item.amount,
-    color: CHART_COLORS[index % CHART_COLORS.length]
+    color: getCategoryColor(item.label)
   }))
 }
 
@@ -58,7 +59,8 @@ export const prepareBarChartData = (expenses) => {
         : item.label,
       amount: item.amount,
       fullName: item.label,
-      count: item.count
+      count: item.count,
+      color: getCategoryColor(item.label)
     }))
 }
 
