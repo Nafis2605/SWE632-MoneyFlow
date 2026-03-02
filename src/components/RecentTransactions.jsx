@@ -1,6 +1,7 @@
 import '../styles/RecentTransactions.css'
 import { formatDate } from '../utils/date'
 import { getRecentTransactions } from '../utils/helpers'
+import { getCategoryLabel } from '../utils/categories'
 
 function RecentTransactions({ transactions }) {
   const recentTxns = getRecentTransactions(transactions, 5)
@@ -28,6 +29,9 @@ function RecentTransactions({ transactions }) {
                   <span className="transaction-title">{transaction.description}</span>
                   <span className={`transaction-badge transaction-badge-${transaction.type}`}>
                     {transaction.type === 'income' ? 'Income' : 'Expense'}
+                  </span>
+                  <span className="transaction-category">
+                    {getCategoryLabel(transaction.category, transaction.type)}
                   </span>
                 </div>
                 <span className="transaction-date">{formatDate(transaction.dateISO)}</span>

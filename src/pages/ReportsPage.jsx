@@ -2,27 +2,16 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import '../styles/ReportsPage.css'
 import { getTodayISO, formatMonthYear } from '../utils/date'
-import { filterByDateRange, filterByMonthYear, getSortedTransactions, downloadTransactionCSV, downloadTransactionPDF } from '../utils/helpers'
-import TransactionFilters from '../components/TransactionFilters'
+import { getSortedTransactions, downloadTransactionCSV, downloadTransactionPDF } from '../utils/helpers'
+import FiltersPanel from '../components/FiltersPanel'
+import { getDefaultFilters, applyFilters } from '../utils/filterModel'
 import { calculateBudgetSummary } from '../utils/budgetCalculations'
 
 function ReportsPage({ transactions }) {
-  const [filters, setFilters] = useState({ type: 'all' })
+  const [filters, setFilters] = useState(getDefaultFilters())
 
-  // Apply filters based on filter state
-  const getFilteredTransactions = () => {
-    let filtered = transactions
-
-    if (filters.type === 'dateRange' && filters.startDate && filters.endDate) {
-      filtered = filterByDateRange(filtered, filters.startDate, filters.endDate)
-    } else if (filters.type === 'monthYear' && filters.year && filters.month) {
-      filtered = filterByMonthYear(filtered, filters.year, filters.month)
-    }
-
-    return getSortedTransactions(filtered)
-  }
-
-  const filteredTransactions = getFilteredTransactions()
+  // Apply filters and get filtered transactions
+  const filteredTransactions = getSortedTransactions(applyFilters(transactions, filters))
 
   // Calculate report data
   const incomeTransactions = filteredTransactions.filter((t) => t.type === 'income')
@@ -99,7 +88,7 @@ function ReportsPage({ transactions }) {
 
       <div className="page-content">
         {/* Filters Section */}
-        <TransactionFilters transactions={transactions} onFilterChange={handleFilterChange} />
+        <FiltersPanel transactions={transactions} onFilterChange={handleFilterChange} />
 
         {/* Report Summary Section */}
         <div className="report-container">

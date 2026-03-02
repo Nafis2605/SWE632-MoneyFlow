@@ -1,27 +1,17 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import '../styles/TransactionsPage.css'
-import { groupTransactionsByMonth, formatMonthKeyHelper, filterByDateRange, filterByMonthYear, getSortedTransactions } from '../utils/helpers'
+import { groupTransactionsByMonth, formatMonthKeyHelper, getSortedTransactions } from '../utils/helpers'
 import { formatDate } from '../utils/date'
-import TransactionFilters from '../components/TransactionFilters'
+import { getCategoryLabel } from '../utils/categories'
+import { getDefaultFilters, applyFilters } from '../utils/filterModel'
+import FiltersPanel from '../components/FiltersPanel'
 
 function TransactionsPage({ transactions }) {
-  const [filters, setFilters] = useState({ type: 'all' })
+  const [filters, setFilters] = useState(getDefaultFilters())
 
-  // Apply filters based on filter state
-  const getFilteredTransactions = () => {
-    let filtered = transactions
-    
-    if (filters.type === 'dateRange' && filters.startDate && filters.endDate) {
-      filtered = filterByDateRange(filtered, filters.startDate, filters.endDate)
-    } else if (filters.type === 'monthYear' && filters.year && filters.month) {
-      filtered = filterByMonthYear(filtered, filters.year, filters.month)
-    }
-    
-    return getSortedTransactions(filtered)
-  }
-
-  const filteredTransactions = getFilteredTransactions()
+  // Apply filters and get filtered transactions
+  const filteredTransactions = getSortedTransactions(applyFilters(transactions, filters))
   const grouped = groupTransactionsByMonth(filteredTransactions)
   const monthKeys = Object.keys(grouped).sort().reverse()
 
@@ -59,7 +49,7 @@ function TransactionsPage({ transactions }) {
 
       <div className="page-content">
         {/* Filters Section */}
-        <TransactionFilters 
+        <FiltersPanel 
           transactions={transactions}
           onFilterChange={handleFilterChange}
         />
@@ -82,6 +72,9 @@ function TransactionsPage({ transactions }) {
                           <span className="transaction-title">{transaction.description}</span>
                           <span className="transaction-date">{formatDate(transaction.dateISO)}</span>
                         </div>
+                      </div>
+                      <div className="transaction-category">
+                        {getCategoryLabel(transaction.category, transaction.type)}
                       </div>
                       <div className={`transaction-type ${transaction.type}`}>
                         {transaction.type === 'income' ? 'Income' : 'Expense'}

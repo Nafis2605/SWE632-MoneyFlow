@@ -2,28 +2,15 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import ExpenseVisualization from '../components/ExpenseVisualization'
 import BudgetSummary from '../components/BudgetSummary'
-import DashboardFilters from '../components/DashboardFilters'
-import { filterByDateRange, filterByMonthYear } from '../utils/helpers'
+import FiltersPanel from '../components/FiltersPanel'
+import { getDefaultFilters, applyFilters } from '../utils/filterModel'
 import '../styles/DashboardPage.css'
 
 function DashboardPage({ budgetState }) {
-  const [filters, setFilters] = useState({ type: 'all' })
+  const [filters, setFilters] = useState(getDefaultFilters())
 
-  // Apply filters based on filter state
-  const getFilteredTransactions = () => {
-    let filtered = budgetState.transactions
-
-    if (filters.type === 'dateRange' && filters.startDate && filters.endDate) {
-      filtered = filterByDateRange(filtered, filters.startDate, filters.endDate)
-    } else if (filters.type === 'monthYear' && filters.year && filters.month) {
-      filtered = filterByMonthYear(filtered, filters.year, filters.month)
-    }
-
-    return filtered
-  }
-
-  // Get filtered expenses for visualization
-  const filteredTransactions = getFilteredTransactions()
+  // Apply filters and get filtered transactions
+  const filteredTransactions = applyFilters(budgetState.transactions, filters)
   const filteredExpenses = filteredTransactions.filter(t => t.type === 'expense')
 
   // Calculate filtered summary
@@ -49,7 +36,7 @@ function DashboardPage({ budgetState }) {
 
       <div className="dashboard-container">
         {/* Filters Section */}
-        <DashboardFilters
+        <FiltersPanel
           transactions={budgetState.transactions}
           onFilterChange={handleFilterChange}
         />
