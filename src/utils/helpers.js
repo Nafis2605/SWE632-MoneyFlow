@@ -33,3 +33,15 @@ export const validateEmail = (email) => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
   return emailRegex.test(email)
 }
+
+/**
+ * Get recent transactions sorted by date (descending)
+ * @param {Transaction[]} transactions - Array of all transactions
+ * @param {number} limit - Maximum number of transactions to return (default: 5)
+ * @returns {Transaction[]} Recent transactions sorted by date descending
+ */
+export const getRecentTransactions = (transactions, limit = 5) => {
+  return [...transactions]
+    .sort((a, b) => new Date(b.date) - new Date(a.date))
+    .slice(0, limit)
+}

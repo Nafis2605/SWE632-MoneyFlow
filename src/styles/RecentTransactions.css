@@ -1,0 +1,123 @@
+/* Recent Transactions Section */
+.recent-transactions-section {
+  padding: var(--spacing-lg);
+}
+
+.recent-transactions-section h2 {
+  font-size: 1.5rem;
+  color: var(--color-dark);
+  margin-bottom: var(--spacing-lg);
+  font-weight: 600;
+}
+
+.transactions-container {
+  overflow: hidden;
+}
+
+.transactions-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.transaction-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-md);
+  background-color: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.transaction-item:hover {
+  background-color: #f3f4f6;
+  border-color: #d1d5db;
+}
+
+.transaction-left {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  flex: 1;
+}
+
+.transaction-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.transaction-title {
+  font-weight: 500;
+  color: var(--color-dark);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.transaction-date {
+  font-size: 0.875rem;
+  color: #999;
+  margin-top: 0.25rem;
+}
+
+.transaction-amount {
+  font-weight: 600;
+  font-size: 1.0625rem;
+  white-space: nowrap;
+  margin-left: var(--spacing-md);
+}
+
+.transaction-amount.income {
+  color: var(--color-success);
+}
+
+.transaction-amount.expense {
+  color: var(--color-warning);
+}
+
+/* Empty state styling */
+.empty-state {
+  text-align: center;
+  padding: 2rem 1rem;
+  color: #6b7280;
+}
+
+.empty-state p {
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .recent-transactions-section {
+    padding: var(--spacing-md);
+  }
+
+  .recent-transactions-section h2 {
+    font-size: 1.25rem;
+    margin-bottom: var(--spacing-md);
+  }
+
+  .transaction-item {
+    padding: var(--spacing-sm) var(--spacing-md);
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .transaction-left {
+    width: 100%;
+    margin-bottom: 0.5rem;
+  }
+
+  .transaction-amount {
+    width: 100%;
+    text-align: right;
+    margin-left: 0;
+  }
+}

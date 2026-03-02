@@ -5,6 +5,7 @@ import IncomeList from './components/IncomeList'
 import ExpenseForm from './components/ExpenseForm'
 import ExpenseList from './components/ExpenseList'
 import BudgetSummary from './components/BudgetSummary'
+import RecentTransactions from './components/RecentTransactions'
 import ExpenseVisualization from './components/ExpenseVisualization'
 import './styles/App.css'
 
@@ -63,6 +64,15 @@ function App() {
               />
             </div>
           </section>
+        </div>
+
+        {/* Full Width: Recent Activity */}
+        <div className="recent-activity-container">
+          <div className="section-wrapper">
+            <RecentTransactions
+              transactions={budgetState.transactions}
+            />
+          </div>
         </div>
 
         {/* Full Width: Expense Visualization */}
