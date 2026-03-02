@@ -1,11 +1,12 @@
 import { useState } from 'react'
 import '../styles/TransactionFilters.css'
+import { getTodayISO, getYearFromISO, getAvailableYears } from '../utils/date'
 import { getAvailableMonths } from '../utils/helpers'
 
 function TransactionFilters({ transactions, onFilterChange }) {
   const [filterType, setFilterType] = useState('all') // 'all', 'dateRange', 'monthYear'
   const [startDate, setStartDate] = useState(getDefaultStartDate())
-  const [endDate, setEndDate] = useState(getDefaultEndDate())
+  const [endDate, setEndDate] = useState(getTodayISO())
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear())
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1)
 
@@ -13,16 +14,14 @@ function TransactionFilters({ transactions, onFilterChange }) {
   function getDefaultStartDate() {
     const date = new Date()
     date.setDate(date.getDate() - 30)
-    return date.toISOString().split('T')[0]
-  }
-
-  // Helper to get default end date (today)
-  function getDefaultEndDate() {
-    return new Date().toISOString().split('T')[0]
+    const year = date.getFullYear()
+    const month = String(date.getMonth() + 1).padStart(2, '0')
+    const day = String(date.getDate()).padStart(2, '0')
+    return `${year}-${month}-${day}`
   }
 
   const availableMonths = getAvailableMonths(transactions)
-  const availableYears = [...new Set(transactions.map(t => new Date(t.date).getFullYear()))].sort().reverse()
+  const availableYears = getAvailableYears(transactions.map(t => t.dateISO))
 
   const handleFilterChange = () => {
     onFilterChange({
@@ -37,7 +36,7 @@ function TransactionFilters({ transactions, onFilterChange }) {
   const handleReset = () => {
     setFilterType('all')
     setStartDate(getDefaultStartDate())
-    setEndDate(getDefaultEndDate())
+    setEndDate(getTodayISO())
     setSelectedYear(new Date().getFullYear())
     setSelectedMonth(new Date().getMonth() + 1)
     onFilterChange({ type: 'all' })

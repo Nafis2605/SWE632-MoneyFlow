@@ -1,34 +1,26 @@
 import { useState } from 'react'
+import { getTodayISO } from '../utils/date'
 import '../styles/TransactionForm.css'
 
 function TransactionForm({ onAddIncome, onAddExpense }) {
   const [type, setType] = useState('income')
   const [title, setTitle] = useState('')
   const [amount, setAmount] = useState('')
-  const [date, setDate] = useState(getToday())
+  const [date, setDate] = useState(getTodayISO())
   const [error, setError] = useState(null)
-
-  // Get today's date in YYYY-MM-DD format
-  function getToday() {
-    const today = new Date()
-    const year = today.getFullYear()
-    const month = String(today.getMonth() + 1).padStart(2, '0')
-    const day = String(today.getDate()).padStart(2, '0')
-    return `${year}-${month}-${day}`
-  }
 
   const handleSubmit = (e) => {
     e.preventDefault()
     setError(null)
 
-    const dateObj = new Date(date)
+    // Pass date directly as ISO string (no conversion needed)
     const callback = type === 'income' ? onAddIncome : onAddExpense
-    const result = callback(title, parseFloat(amount), dateObj)
+    const result = callback(title, parseFloat(amount), date)
     
     if (result.success) {
       setTitle('')
       setAmount('')
-      setDate(getToday())
+      setDate(getTodayISO())
     } else {
       setError(result.errors[0])
     }

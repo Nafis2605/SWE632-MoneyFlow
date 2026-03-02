@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import '../styles/ReportsPage.css'
+import { getTodayISO, formatMonthYear } from '../utils/date'
 import { filterByDateRange, filterByMonthYear, getSortedTransactions, downloadTransactionCSV, downloadTransactionPDF } from '../utils/helpers'
 import TransactionFilters from '../components/TransactionFilters'
 import { calculateBudgetSummary } from '../utils/budgetCalculations'
@@ -42,7 +43,7 @@ function ReportsPage({ transactions }) {
 
   // Generate filename based on filter type and current date
   const generateFileName = () => {
-    const today = new Date().toISOString().split('T')[0]
+    const today = getTodayISO()
     
     if (filters.type === 'dateRange' && filters.startDate && filters.endDate) {
       return `transactions_${filters.startDate}_to_${filters.endDate}`
@@ -57,10 +58,7 @@ function ReportsPage({ transactions }) {
     if (filters.type === 'dateRange' && filters.startDate && filters.endDate) {
       return `${filters.startDate} to ${filters.endDate}`
     } else if (filters.type === 'monthYear' && filters.year && filters.month) {
-      return new Date(filters.year, filters.month - 1).toLocaleDateString('en-US', {
-        month: 'long',
-        year: 'numeric',
-      })
+      return formatMonthYear(filters.year, filters.month)
     }
     return 'All Transactions'
   }
@@ -112,10 +110,7 @@ function ReportsPage({ transactions }) {
                 <p className="filter-applied">
                   {filters.type === 'dateRange'
                     ? `${filters.startDate} to ${filters.endDate}`
-                    : `${new Date(filters.year, filters.month - 1).toLocaleDateString('en-US', {
-                        month: 'long',
-                        year: 'numeric',
-                      })}`}
+                    : formatMonthYear(filters.year, filters.month)}
                 </p>
               )}
             </div>

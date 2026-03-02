@@ -11,7 +11,7 @@
  * @property {string} type - Transaction type: "income" or "expense"
  * @property {string} title - Name/description of the transaction
  * @property {number} amount - Transaction amount (in dollars)
- * @property {Date} date - Full JavaScript Date object
+ * @property {string} dateISO - ISO date string (YYYY-MM-DD) to avoid timezone issues
  */
 
 /**
@@ -24,16 +24,34 @@
  * @param {string} type - Transaction type: "income" or "expense"
  * @param {string} title - Name/description of the transaction
  * @param {number} amount - Amount of the transaction
- * @param {Date} date - Date of the transaction (defaults to today)
+ * @param {string|Date} dateISO - Date of the transaction as ISO string (YYYY-MM-DD) or Date object (defaults to today)
  * @returns {Transaction} New transaction object
  */
-export const createTransaction = (type, title, amount, date = new Date()) => {
+export const createTransaction = (type, title, amount, dateISO) => {
+  let isoDate = dateISO
+  
+  // Convert Date object to ISO string if needed
+  if (dateISO instanceof Date) {
+    const year = dateISO.getFullYear()
+    const month = String(dateISO.getMonth() + 1).padStart(2, '0')
+    const day = String(dateISO.getDate()).padStart(2, '0')
+    isoDate = `${year}-${month}-${day}`
+  }
+  // If no date provided, use today
+  else if (!dateISO) {
+    const today = new Date()
+    const year = today.getFullYear()
+    const month = String(today.getMonth() + 1).padStart(2, '0')
+    const day = String(today.getDate()).padStart(2, '0')
+    isoDate = `${year}-${month}-${day}`
+  }
+  
   return {
     id: generateId(),
     type: type.toLowerCase(),
     title: title.trim(),
     amount: Math.max(0, parseFloat(amount)),
-    date: date instanceof Date ? date : new Date(date)
+    dateISO: isoDate
   }
 }
 

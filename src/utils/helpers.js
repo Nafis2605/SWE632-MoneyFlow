@@ -1,5 +1,6 @@
 /* eslint-disable-next-line import/no-unresolved */
 import { jsPDF } from 'jspdf'
+import { formatDate, formatISODate, compareISO, getYearFromISO, getMonthFromISO, formatMonthYear } from './date'
 
 /**
  * Utility function to format currency
@@ -16,11 +17,14 @@ export const formatCurrency = (amount, currency = 'USD') => {
 
 /**
  * Utility function to format date
- * @param {Date|string} date - The date to format
+ * @param {string|Date} date - The date to format (ISO string or Date object)
  * @returns {string} Formatted date string
  */
-export const formatDate = (date) => {
-  return new Date(date).toLocaleDateString('en-US', {
+export const formatDateHelper = (date) => {
+  if (typeof date === 'string') {
+    return formatISODate(date)
+  }
+  return date.toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'short',
     day: 'numeric'
@@ -45,7 +49,7 @@ export const validateEmail = (email) => {
  */
 export const getRecentTransactions = (transactions, limit = 5) => {
   return [...transactions]
-    .sort((a, b) => new Date(b.date) - new Date(a.date))
+    .sort((a, b) => compareISO(b.dateISO, a.dateISO))
     .slice(0, limit)
 }
 
@@ -55,7 +59,7 @@ export const getRecentTransactions = (transactions, limit = 5) => {
  * @returns {Transaction[]} Transactions sorted by date descending
  */
 export const getSortedTransactions = (transactions) => {
-  return [...transactions].sort((a, b) => new Date(b.date) - new Date(a.date))
+  return [...transactions].sort((a, b) => compareISO(b.dateISO, a.dateISO))
 }
 
 /**
@@ -68,9 +72,8 @@ export const groupTransactionsByMonth = (transactions) => {
   const grouped = {}
 
   sorted.forEach((transaction) => {
-    const date = new Date(transaction.date)
-    const year = date.getFullYear()
-    const month = String(date.getMonth() + 1).padStart(2, '0')
+    const year = getYearFromISO(transaction.dateISO)
+    const month = String(getMonthFromISO(transaction.dateISO)).padStart(2, '0')
     const key = `${year}-${month}`
 
     if (!grouped[key]) {
@@ -87,29 +90,22 @@ export const groupTransactionsByMonth = (transactions) => {
  * @param {string} monthKey - Key in format "YYYY-MM"
  * @returns {string} Formatted month like "March 2026"
  */
-export const formatMonthKey = (monthKey) => {
+export const formatMonthKeyHelper = (monthKey) => {
   const [year, month] = monthKey.split('-')
-  const date = new Date(year, parseInt(month) - 1)
-  return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long' })
+  return formatMonthYear(parseInt(year), parseInt(month))
 }
 
 /**
  * Filter transactions by date range
  * @param {Transaction[]} transactions - Array of transactions
- * @param {Date|string} startDate - Start date (inclusive)
- * @param {Date|string} endDate - End date (inclusive)
- * @returns {Transaction[]} Filtered transactions within date range
+ * @param {string} startDate - Start date as ISO string (YYYY-MM-DD)
+ * @param {string} endDate - End date as ISO string (YYYY-MM-DD)
+ * @returns {Transaction[]} Filtered transactions within date range (inclusive)
  */
 export const filterByDateRange = (transactions, startDate, endDate) => {
-  const start = new Date(startDate)
-  const end = new Date(endDate)
-  
-  // Set end date to end of day
-  end.setHours(23, 59, 59, 999)
-  
   return transactions.filter(transaction => {
-    const txnDate = new Date(transaction.date)
-    return txnDate >= start && txnDate <= end
+    const txnDate = transaction.dateISO
+    return txnDate >= startDate && txnDate <= endDate
   })
 }
 
@@ -122,13 +118,12 @@ export const filterByDateRange = (transactions, startDate, endDate) => {
  */
 export const filterByMonthYear = (transactions, year, month) => {
   return transactions.filter(transaction => {
-    const txnDate = new Date(transaction.date)
-    return txnDate.getFullYear() === year && txnDate.getMonth() + 1 === month
+    return getYearFromISO(transaction.dateISO) === year && getMonthFromISO(transaction.dateISO) === month
   })
 }
 
 /**
- * Get unique months from transactions (sorted descending)
+ * Get available months for filtering
  * @param {Transaction[]} transactions - Array of transactions
  * @returns {Array} Array of {year, month, label} objects
  */
@@ -136,8 +131,9 @@ export const getAvailableMonths = (transactions) => {
   const months = new Set()
   
   transactions.forEach(transaction => {
-    const date = new Date(transaction.date)
-    const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`
+    const year = getYearFromISO(transaction.dateISO)
+    const month = getMonthFromISO(transaction.dateISO)
+    const key = `${year}-${String(month).padStart(2, '0')}`
     months.add(key)
   })
   
@@ -150,7 +146,7 @@ export const getAvailableMonths = (transactions) => {
         key,
         year: parseInt(year),
         month: parseInt(month),
-        label: formatMonthKey(key)
+        label: formatMonthKeyHelper(key)
       }
     })
 }
@@ -174,7 +170,7 @@ export const generateTransactionCSV = (transactions) => {
   
   // Convert transactions to CSV rows
   const rows = transactions.map(transaction => [
-    formatDate(transaction.date),
+    formatDate(transaction.dateISO),
     escapeCSVValue(transaction.title),
     transaction.type.charAt(0).toUpperCase() + transaction.type.slice(1),
     `$${transaction.amount.toFixed(2)}`
@@ -338,7 +334,7 @@ export const generateTransactionPDF = (transactions, summary, filterInfo = '') =
       doc.setFont(undefined, 'normal')
     }
     
-    const date = formatDate(transaction.date)
+    const date = formatDate(transaction.dateISO)
     const type = transaction.type.charAt(0).toUpperCase() + transaction.type.slice(1)
     const amount = `$${transaction.amount.toFixed(2)}`
     

@@ -1,5 +1,5 @@
 import '../styles/ExpenseList.css'
-import { formatDate } from '../utils/helpers'
+import { formatDate } from '../utils/date'
 
 function ExpenseList({ expenses, onDeleteExpense }) {
   if (expenses.length === 0) {
@@ -23,7 +23,7 @@ function ExpenseList({ expenses, onDeleteExpense }) {
               <div className="expense-content">
                 <div className="expense-details">
                   <span className="expense-name">{expense.title}</span>
-                  <span className="expense-date">{formatDate(expense.date)}</span>
+                  <span className="expense-date">{formatDate(expense.dateISO)}</span>
                 </div>
                 <span className="expense-amount">${expense.amount.toFixed(2)}</span>
               </div>

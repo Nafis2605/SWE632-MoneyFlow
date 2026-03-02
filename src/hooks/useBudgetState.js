@@ -5,6 +5,7 @@
  */
 
 import { useState, useCallback } from 'react'
+import { getTodayISO } from '../utils/date'
 import {
   createTransaction,
   validateTransaction,
@@ -25,8 +26,11 @@ export const useBudgetState = () => {
   /**
    * Add a new income transaction
    * Creates immutable copy of transactions array
+   * @param {string} title - Income title
+   * @param {number} amount - Income amount
+   * @param {string|Date} date - ISO date string or Date object (defaults to today)
    */
-  const addIncome = useCallback((title, amount, date = new Date()) => {
+  const addIncome = useCallback((title, amount, date) => {
     const validation = validateTransaction(title, amount)
     if (!validation.isValid) {
       return { success: false, errors: validation.errors }
@@ -40,8 +44,11 @@ export const useBudgetState = () => {
   /**
    * Add a new expense transaction
    * Creates immutable copy of transactions array
+   * @param {string} title - Expense title
+   * @param {number} amount - Expense amount
+   * @param {string|Date} date - ISO date string or Date object (defaults to today)
    */
-  const addExpense = useCallback((title, amount, date = new Date()) => {
+  const addExpense = useCallback((title, amount, date) => {
     const validation = validateTransaction(title, amount)
     if (!validation.isValid) {
       return { success: false, errors: validation.errors }

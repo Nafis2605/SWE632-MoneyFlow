@@ -1,5 +1,5 @@
 import '../styles/IncomeList.css'
-import { formatDate } from '../utils/helpers'
+import { formatDate } from '../utils/date'
 
 function IncomeList({ incomes, onDeleteIncome }) {
   if (incomes.length === 0) {
@@ -23,7 +23,7 @@ function IncomeList({ incomes, onDeleteIncome }) {
               <div className="income-content">
                 <div className="income-details">
                   <span className="income-title">{income.title}</span>
-                  <span className="income-date">{formatDate(income.date)}</span>
+                  <span className="income-date">{formatDate(income.dateISO)}</span>
                 </div>
                 <span className="income-amount">${income.amount.toFixed(2)}</span>
               </div>

@@ -1,5 +1,5 @@
 import '../styles/RecentTransactions.css'
-import { formatDate } from '../utils/helpers'
+import { formatDate } from '../utils/date'
 import { getRecentTransactions } from '../utils/helpers'
 
 function RecentTransactions({ transactions }) {
@@ -30,7 +30,7 @@ function RecentTransactions({ transactions }) {
                     {transaction.type === 'income' ? 'Income' : 'Expense'}
                   </span>
                 </div>
-                <span className="transaction-date">{formatDate(transaction.date)}</span>
+                <span className="transaction-date">{formatDate(transaction.dateISO)}</span>
               </div>
               <div className={`transaction-amount transaction-amount-${transaction.type}`}>
                 <span className="amount-sign">{transaction.type === 'income' ? '+' : '−'}</span>

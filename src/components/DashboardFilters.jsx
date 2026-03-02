@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { getTodayISO } from '../utils/date'
 import { getAvailableMonths } from '../utils/helpers'
 import '../styles/DashboardFilters.css'
 
@@ -59,8 +60,7 @@ function DashboardFilters({ transactions, onFilterChange }) {
   }
 
   const getToday = () => {
-    const today = new Date()
-    return today.toISOString().split('T')[0]
+    return getTodayISO()
   }
 
   return (

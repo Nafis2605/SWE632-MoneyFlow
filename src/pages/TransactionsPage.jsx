@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import '../styles/TransactionsPage.css'
-import { groupTransactionsByMonth, formatMonthKey, formatDate, filterByDateRange, filterByMonthYear, getSortedTransactions } from '../utils/helpers'
+import { groupTransactionsByMonth, formatMonthKeyHelper, filterByDateRange, filterByMonthYear, getSortedTransactions } from '../utils/helpers'
+import { formatDate } from '../utils/date'
 import TransactionFilters from '../components/TransactionFilters'
 
 function TransactionsPage({ transactions }) {
@@ -72,14 +73,14 @@ function TransactionsPage({ transactions }) {
           <>
             {monthKeys.map((monthKey) => (
               <div key={monthKey} className="month-group">
-                <h2 className="month-header">{formatMonthKey(monthKey)}</h2>
+                <h2 className="month-header">{formatMonthKeyHelper(monthKey)}</h2>
                 <div className="transactions-list">
                   {grouped[monthKey].map((transaction) => (
                     <div key={transaction.id} className="transaction-row">
                       <div className="transaction-left">
                         <div className="transaction-meta">
                           <span className="transaction-title">{transaction.title}</span>
-                          <span className="transaction-date">{formatDate(transaction.date)}</span>
+                          <span className="transaction-date">{formatDate(transaction.dateISO)}</span>
                         </div>
                       </div>
                       <div className={`transaction-type ${transaction.type}`}>

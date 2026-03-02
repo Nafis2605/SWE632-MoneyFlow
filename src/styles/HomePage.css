@@ -58,13 +58,7 @@
   gap: var(--spacing-lg);
 }
 
-.input-column {
-  /* Left column for inputs */
-}
 
-.content-column {
-  /* Right column for summary and expenses */
-}
 
 .section-wrapper {
   background: white;
