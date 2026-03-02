@@ -1,4 +1,5 @@
 import '../styles/ExpenseList.css'
+import { formatDate } from '../utils/helpers'
 
 function ExpenseList({ expenses, onDeleteExpense }) {
   if (expenses.length === 0) {
@@ -20,14 +21,17 @@ function ExpenseList({ expenses, onDeleteExpense }) {
           {expenses.map((expense) => (
             <li key={expense.id} className="expense-item">
               <div className="expense-content">
-                <span className="expense-name">{expense.name}</span>
+                <div className="expense-details">
+                  <span className="expense-name">{expense.title}</span>
+                  <span className="expense-date">{formatDate(expense.date)}</span>
+                </div>
                 <span className="expense-amount">${expense.amount.toFixed(2)}</span>
               </div>
               <button
                 className="btn-delete"
                 onClick={() => onDeleteExpense(expense.id)}
                 title="Delete expense"
-                aria-label={`Delete ${expense.name}`}
+                aria-label={`Delete ${expense.title}`}
               >
                 ✕
               </button>

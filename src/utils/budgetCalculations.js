@@ -5,15 +5,43 @@
  * Used by components to maintain single responsibility principle
  */
 
+import {
+  calculateTotalIncome,
+  calculateTotalExpenses,
+  calculateNetBudget
+} from '../models/budgetModels'
+
+/**
+ * Calculate complete budget summary from transactions
+ * Provides all summary metrics in one call
+ * @param {Transaction[]} transactions - Array of all transactions
+ * @returns {Object} Summary object with income, expenses, remaining, and percentage
+ */
+export const calculateBudgetSummary = (transactions) => {
+  const totalIncome = calculateTotalIncome(transactions)
+  const totalExpenses = calculateTotalExpenses(transactions)
+  const remainingBudget = calculateNetBudget(transactions)
+  const budgetPercentage = calculateBudgetPercentage(totalExpenses, totalIncome)
+  
+  return {
+    totalIncome,
+    totalExpenses,
+    remainingBudget,
+    budgetPercentage,
+    isOverBudget: remainingBudget < 0,
+    overBudgetAmount: Math.max(0, Math.abs(remainingBudget))
+  }
+}
+
 /**
  * Calculate budget usage percentage
  * @param {number} totalExpenses - Total amount of expenses
- * @param {number} income - Monthly income
+ * @param {number} totalIncome - Total income
  * @returns {number} Percentage of budget used (0-100+)
  */
-export const calculateBudgetPercentage = (totalExpenses, income) => {
-  if (income <= 0) return 0
-  return (totalExpenses / income) * 100
+export const calculateBudgetPercentage = (totalExpenses, totalIncome) => {
+  if (totalIncome <= 0) return 0
+  return (totalExpenses / totalIncome) * 100
 }
 
 /**

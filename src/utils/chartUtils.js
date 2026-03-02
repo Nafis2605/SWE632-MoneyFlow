@@ -15,12 +15,12 @@ export const CHART_COLORS = [
 
 /**
  * Transform expenses for pie chart
- * @param {Array} expenses - Array of expense objects
+ * @param {Array} expenses - Array of expense objects (transactions)
  * @returns {Array} Data formatted for pie chart
  */
 export const preparePieChartData = (expenses) => {
   return expenses.map((expense, index) => ({
-    name: expense.name,
+    name: expense.title,
     value: expense.amount,
     color: CHART_COLORS[index % CHART_COLORS.length]
   }))
@@ -28,7 +28,7 @@ export const preparePieChartData = (expenses) => {
 
 /**
  * Transform expenses for bar chart (top 10)
- * @param {Array} expenses - Array of expense objects
+ * @param {Array} expenses - Array of expense objects (transactions)
  * @returns {Array} Sorted data for bar chart, limited to 10 items
  */
 export const prepareBarChartData = (expenses) => {
@@ -38,11 +38,11 @@ export const prepareBarChartData = (expenses) => {
     .sort((a, b) => b.amount - a.amount)
     .slice(0, 10)
     .map((expense) => ({
-      name: expense.name.length > maxLength
-        ? expense.name.substring(0, maxLength) + '...'
-        : expense.name,
+      name: expense.title.length > maxLength
+        ? expense.title.substring(0, maxLength) + '...'
+        : expense.title,
       amount: expense.amount,
-      fullName: expense.name
+      fullName: expense.title
     }))
 }
 

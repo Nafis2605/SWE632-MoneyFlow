@@ -2,37 +2,63 @@
  * Budget Planner Data Models
  * 
  * Defines the core data structures for the MoneyFlow application
+ * Uses a unified transaction-based system for both income and expenses
  */
 
 /**
- * @typedef {Object} Expense
- * @property {string} id - Unique identifier for the expense (UUID or similar)
- * @property {string} name - Name/description of the expense
- * @property {number} amount - Amount spent (in dollars)
+ * @typedef {Object} Transaction
+ * @property {string} id - Unique identifier for the transaction
+ * @property {string} type - Transaction type: "income" or "expense"
+ * @property {string} title - Name/description of the transaction
+ * @property {number} amount - Transaction amount (in dollars)
+ * @property {Date} date - Full JavaScript Date object
  */
 
 /**
  * @typedef {Object} BudgetState
- * @property {number} income - Monthly income amount
- * @property {Expense[]} expenses - List of expenses
+ * @property {Transaction[]} transactions - List of all transactions (income and expenses)
  */
 
 /**
- * Create a new expense object
- * @param {string} name - Name/description of the expense
- * @param {number} amount - Amount of the expense
- * @returns {Expense} New expense object
+ * Create a new transaction object
+ * @param {string} type - Transaction type: "income" or "expense"
+ * @param {string} title - Name/description of the transaction
+ * @param {number} amount - Amount of the transaction
+ * @param {Date} date - Date of the transaction (defaults to today)
+ * @returns {Transaction} New transaction object
  */
-export const createExpense = (name, amount) => {
+export const createTransaction = (type, title, amount, date = new Date()) => {
   return {
     id: generateId(),
-    name: name.trim(),
-    amount: Math.max(0, parseFloat(amount))
+    type: type.toLowerCase(),
+    title: title.trim(),
+    amount: Math.max(0, parseFloat(amount)),
+    date: date instanceof Date ? date : new Date(date)
   }
 }
 
 /**
- * Generate a unique ID for expenses
+ * Create a new expense transaction (convenience function)
+ * @param {string} title - Name/description of the expense
+ * @param {number} amount - Amount of the expense
+ * @returns {Transaction} New expense transaction object
+ */
+export const createExpense = (title, amount) => {
+  return createTransaction('expense', title, amount)
+}
+
+/**
+ * Create a new income transaction (convenience function)
+ * @param {string} title - Name/description of the income
+ * @param {number} amount - Amount of the income
+ * @returns {Transaction} New income transaction object
+ */
+export const createIncome = (title, amount) => {
+  return createTransaction('income', title, amount)
+}
+
+/**
+ * Generate a unique ID for transactions
  * @returns {string} Unique identifier
  */
 export const generateId = () => {
@@ -40,54 +66,65 @@ export const generateId = () => {
 }
 
 /**
- * Calculate total expenses
- * @param {Expense[]} expenses - List of expenses
- * @returns {number} Total amount of all expenses
+ * Filter transactions by type
+ * @param {Transaction[]} transactions - Array of transactions
+ * @param {string} type - Type to filter by: "income" or "expense"
+ * @returns {Transaction[]} Filtered transactions
  */
-export const calculateTotalExpenses = (expenses) => {
-  return expenses.reduce((total, expense) => total + expense.amount, 0)
+export const filterTransactionsByType = (transactions, type) => {
+  return transactions.filter(transaction => transaction.type === type.toLowerCase())
 }
 
 /**
- * Calculate remaining budget
- * @param {number} income - Monthly income
- * @param {number} totalExpenses - Total expenses
- * @returns {number} Remaining budget amount
+ * Calculate total income from transactions
+ * @param {Transaction[]} transactions - Array of transactions
+ * @returns {number} Total income amount
  */
-export const calculateRemainingBudget = (income, totalExpenses) => {
-  return income - totalExpenses
+export const calculateTotalIncome = (transactions) => {
+  return filterTransactionsByType(transactions, 'income')
+    .reduce((total, transaction) => total + transaction.amount, 0)
 }
 
 /**
- * Calculate expense percentage of income
- * @param {number} expenseAmount - Amount of single expense
- * @param {number} income - Monthly income
- * @returns {number} Percentage (0-100)
+ * Calculate total expenses from transactions
+ * @param {Transaction[]} transactions - Array of transactions
+ * @returns {number} Total expenses amount
  */
-export const calculateExpensePercentage = (expenseAmount, income) => {
-  if (income === 0) return 0
-  return (expenseAmount / income) * 100
+export const calculateTotalExpenses = (transactions) => {
+  return filterTransactionsByType(transactions, 'expense')
+    .reduce((total, transaction) => total + transaction.amount, 0)
 }
 
 /**
- * Validate expense data
- * @param {string} name - Expense name
- * @param {number} amount - Expense amount
+ * Calculate net budget (income - expenses)
+ * @param {Transaction[]} transactions - Array of transactions
+ * @returns {number} Net budget amount
+ */
+export const calculateNetBudget = (transactions) => {
+  const totalIncome = calculateTotalIncome(transactions)
+  const totalExpenses = calculateTotalExpenses(transactions)
+  return totalIncome - totalExpenses
+}
+
+/**
+ * Validate transaction data
+ * @param {string} title - Transaction title
+ * @param {number} amount - Transaction amount
  * @returns {Object} Validation result with isValid flag and error messages
  */
-export const validateExpense = (name, amount) => {
+export const validateTransaction = (title, amount) => {
   const errors = []
   
-  if (!name || name.trim().length === 0) {
-    errors.push('Expense name is required')
+  if (!title || title.trim().length === 0) {
+    errors.push('Transaction title is required')
   }
   
-  if (name && name.trim().length > 100) {
-    errors.push('Expense name cannot exceed 100 characters')
+  if (title && title.trim().length > 100) {
+    errors.push('Transaction title cannot exceed 100 characters')
   }
   
   if (isNaN(amount) || amount < 0) {
-    errors.push('Expense amount must be a positive number')
+    errors.push('Transaction amount must be a positive number')
   }
   
   return {
@@ -97,19 +134,21 @@ export const validateExpense = (name, amount) => {
 }
 
 /**
- * Validate income data
- * @param {number} income - Monthly income amount
+ * Validate expense data (uses transaction validation)
+ * @param {string} title - Expense title
+ * @param {number} amount - Expense amount
  * @returns {Object} Validation result with isValid flag and error messages
  */
-export const validateIncome = (income) => {
-  const errors = []
-  
-  if (isNaN(income) || income < 0) {
-    errors.push('Income must be a positive number')
-  }
-  
-  return {
-    isValid: errors.length === 0,
-    errors
-  }
+export const validateExpense = (title, amount) => {
+  return validateTransaction(title, amount)
+}
+
+/**
+ * Validate income data (uses transaction validation)
+ * @param {string} title - Income title
+ * @param {number} amount - Income amount
+ * @returns {Object} Validation result with isValid flag and error messages
+ */
+export const validateIncome = (title, amount) => {
+  return validateTransaction(title, amount)
 }

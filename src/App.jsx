@@ -1,6 +1,7 @@
 import { useBudgetState } from './hooks/useBudgetState'
 import Header from './components/Header'
-import IncomeInput from './components/IncomeInput'
+import IncomeForm from './components/IncomeInput'
+import IncomeList from './components/IncomeList'
 import ExpenseForm from './components/ExpenseForm'
 import ExpenseList from './components/ExpenseList'
 import BudgetSummary from './components/BudgetSummary'
@@ -8,7 +9,7 @@ import ExpenseVisualization from './components/ExpenseVisualization'
 import './styles/App.css'
 
 function App() {
-  const budgetState = useBudgetState(0)
+  const budgetState = useBudgetState()
 
   return (
     <div className="app">
@@ -26,9 +27,8 @@ function App() {
           {/* Left Column: Income & Expense Input */}
           <section className="section-column input-column">
             <div className="section-wrapper">
-              <IncomeInput 
-                income={budgetState.income} 
-                onIncomeChange={budgetState.setMonthlyIncome}
+              <IncomeForm 
+                onAddIncome={budgetState.addIncome}
               />
             </div>
 
@@ -39,13 +39,20 @@ function App() {
             </div>
           </section>
 
-          {/* Right Column: Summary & Expenses Management */}
+          {/* Right Column: Summary & Transactions */}
           <section className="section-column content-column">
             <div className="section-wrapper">
               <BudgetSummary
-                income={budgetState.income}
+                income={budgetState.totalIncome}
                 totalExpenses={budgetState.totalExpenses}
                 remainingBudget={budgetState.remainingBudget}
+              />
+            </div>
+
+            <div className="section-wrapper">
+              <IncomeList
+                incomes={budgetState.incomeTransactions}
+                onDeleteIncome={budgetState.deleteIncome}
               />
             </div>
 
