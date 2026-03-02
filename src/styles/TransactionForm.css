@@ -1,0 +1,201 @@
+.transaction-form-section {
+  background: var(--card-bg);
+  border-radius: var(--border-radius);
+  padding: 1.5rem;
+  box-shadow: var(--card-shadow);
+  border: 1px solid var(--border-color);
+}
+
+.transaction-form-header {
+  margin-bottom: 1.5rem;
+}
+
+.transaction-form-header h2 {
+  font-size: 1.5rem;
+  margin: 0 0 1rem 0;
+  color: var(--text-primary);
+}
+
+/* Toggle Buttons */
+.transaction-toggle {
+  display: flex;
+  gap: 0.5rem;
+  background: var(--bg-secondary);
+  padding: 0.25rem;
+  border-radius: var(--border-radius);
+  width: fit-content;
+}
+
+.toggle-btn {
+  flex: 1;
+  padding: 0.625rem 1.25rem;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: calc(var(--border-radius) - 2px);
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  min-width: 100px;
+}
+
+.toggle-btn:hover {
+  color: var(--text-primary);
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.toggle-btn.active {
+  background: var(--primary-color);
+  color: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.toggle-btn:focus-visible {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
+}
+
+/* Form Group */
+.transaction-form .form-group {
+  margin-bottom: 1rem;
+}
+
+.transaction-form .form-group:last-of-type {
+  margin-bottom: 1.5rem;
+}
+
+.transaction-form label {
+  display: block;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.transaction-form .form-input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid var(--border-color);
+  border-radius: calc(var(--border-radius) - 2px);
+  font-size: 1rem;
+  transition: border-color 0.2s ease;
+  background: var(--input-bg);
+  color: var(--text-primary);
+}
+
+.transaction-form .form-input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(66, 135, 245, 0.1);
+}
+
+.transaction-form .input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.transaction-form .currency-symbol {
+  position: absolute;
+  left: 0.75rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.transaction-form .form-input[type='number'] {
+  padding-left: 2rem;
+}
+
+/* Error Message */
+.transaction-form .error-message {
+  color: var(--error-color);
+  font-size: 0.9rem;
+  margin-top: -0.75rem;
+  margin-bottom: 1rem;
+  padding: 0.5rem;
+  background: rgba(231, 76, 60, 0.1);
+  border-radius: calc(var(--border-radius) - 2px);
+  border-left: 3px solid var(--error-color);
+}
+
+/* Button */
+.transaction-form .btn {
+  width: 100%;
+  padding: 0.875rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: calc(var(--border-radius) - 2px);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.transaction-form .btn-primary {
+  background: linear-gradient(135deg, var(--primary-color), #2471a3);
+  color: white;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.transaction-form .btn-primary:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.transaction-form .btn-primary:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.transaction-form .btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.transaction-form .btn:focus-visible {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .transaction-form-section {
+    padding: 1.25rem;
+  }
+
+  .transaction-form-header h2 {
+    font-size: 1.25rem;
+  }
+
+  .transaction-toggle {
+    flex-direction: row;
+    gap: 0.5rem;
+  }
+
+  .toggle-btn {
+    flex: 1;
+    min-width: auto;
+    padding: 0.5rem 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .transaction-form-section {
+    padding: 1rem;
+  }
+
+  .transaction-form-header h2 {
+    font-size: 1.1rem;
+  }
+
+  .toggle-btn {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.9rem;
+  }
+
+  .transaction-form .form-input {
+    font-size: 16px; /* Prevents zoom on iOS */
+  }
+}

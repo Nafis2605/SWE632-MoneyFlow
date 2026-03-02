@@ -1,7 +1,4 @@
-import IncomeForm from '../components/IncomeInput'
-import IncomeList from '../components/IncomeList'
-import ExpenseForm from '../components/ExpenseForm'
-import ExpenseList from '../components/ExpenseList'
+import TransactionForm from '../components/TransactionForm'
 import BudgetSummary from '../components/BudgetSummary'
 import RecentTransactions from '../components/RecentTransactions'
 import '../styles/HomePage.css'
@@ -17,42 +14,23 @@ function HomePage({ budgetState }) {
       </div>
 
       <div className="layout-container">
-        {/* Left Column: Income & Expense Input */}
+        {/* Left Column: Transaction Input */}
         <section className="section-column input-column">
           <div className="section-wrapper">
-            <IncomeForm 
+            <TransactionForm 
               onAddIncome={budgetState.addIncome}
-            />
-          </div>
-
-          <div className="section-wrapper">
-            <ExpenseForm 
               onAddExpense={budgetState.addExpense}
             />
           </div>
         </section>
 
-        {/* Right Column: Summary & Transactions */}
+        {/* Right Column: Budget Summary */}
         <section className="section-column content-column">
           <div className="section-wrapper">
             <BudgetSummary
               income={budgetState.totalIncome}
               totalExpenses={budgetState.totalExpenses}
               remainingBudget={budgetState.remainingBudget}
-            />
-          </div>
-
-          <div className="section-wrapper">
-            <IncomeList
-              incomes={budgetState.incomeTransactions}
-              onDeleteIncome={budgetState.deleteIncome}
-            />
-          </div>
-
-          <div className="section-wrapper">
-            <ExpenseList
-              expenses={budgetState.expenses}
-              onDeleteExpense={budgetState.deleteExpense}
             />
           </div>
         </section>

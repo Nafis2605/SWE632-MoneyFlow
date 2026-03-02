@@ -23,14 +23,18 @@ function RecentTransactions({ transactions }) {
         <ul className="transactions-list">
           {recentTxns.map((transaction) => (
             <li key={transaction.id} className="transaction-item">
-              <div className="transaction-left">
-                <div className="transaction-info">
+              <div className="transaction-main">
+                <div className="transaction-header">
                   <span className="transaction-title">{transaction.title}</span>
-                  <span className="transaction-date">{formatDate(transaction.date)}</span>
+                  <span className={`transaction-badge transaction-badge-${transaction.type}`}>
+                    {transaction.type === 'income' ? 'Income' : 'Expense'}
+                  </span>
                 </div>
+                <span className="transaction-date">{formatDate(transaction.date)}</span>
               </div>
-              <div className={`transaction-amount ${transaction.type}`}>
-                {transaction.type === 'income' ? '+' : '-'}${transaction.amount.toFixed(2)}
+              <div className={`transaction-amount transaction-amount-${transaction.type}`}>
+                <span className="amount-sign">{transaction.type === 'income' ? '+' : '−'}</span>
+                <span className="amount-value">${transaction.amount.toFixed(2)}</span>
               </div>
             </li>
           ))}
