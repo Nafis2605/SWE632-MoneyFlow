@@ -79,7 +79,7 @@ function TransactionsPage({ transactions }) {
                     <div key={transaction.id} className="transaction-row">
                       <div className="transaction-left">
                         <div className="transaction-meta">
-                          <span className="transaction-title">{transaction.title}</span>
+                          <span className="transaction-title">{transaction.description}</span>
                           <span className="transaction-date">{formatDate(transaction.dateISO)}</span>
                         </div>
                       </div>

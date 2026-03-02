@@ -79,7 +79,7 @@ function ExpenseVisualization({ expenses }) {
               />
               <Bar 
                 dataKey="amount" 
-                fill="#5367AB"
+                fill="#dc2626"
                 radius={[8, 8, 0, 0]}
                 animationDuration={300}
               />

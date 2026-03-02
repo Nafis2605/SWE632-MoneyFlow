@@ -76,7 +76,7 @@
 
 .income-amount {
   font-weight: 600;
-  color: #059669;
+  color: var(--color-income);
   font-size: 1.0625rem;
   white-space: nowrap;
   margin-left: auto;

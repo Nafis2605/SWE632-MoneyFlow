@@ -1,10 +1,13 @@
 /**
  * Color palette constants for the MoneyFlow application
+ * Semantic colors: Income = Green, Expense = Red
  */
 export const COLORS = {
-  primary: '#5367AB',      // Blue
-  warning: '#f9c74f',      // Yellow/Gold
-  success: '#008000',      // Green
+  primary: '#5367AB',      // Blue - brand color
+  income: '#16a34a',       // Green - income transactions
+  expense: '#dc2626',      // Red - expense transactions
+  warning: '#dc2626',      // Red - warnings and expenses (changed from yellow)
+  success: '#16a34a',      // Green - success and positive values
   light: '#ffffff',        // White
   background: '#ffffff'    // White Background
 }

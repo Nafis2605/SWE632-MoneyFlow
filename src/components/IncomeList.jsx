@@ -22,7 +22,7 @@ function IncomeList({ incomes, onDeleteIncome }) {
             <li key={income.id} className="income-item">
               <div className="income-content">
                 <div className="income-details">
-                  <span className="income-title">{income.title}</span>
+                  <span className="income-title">{income.description}</span>
                   <span className="income-date">{formatDate(income.dateISO)}</span>
                 </div>
                 <span className="income-amount">${income.amount.toFixed(2)}</span>
@@ -31,7 +31,7 @@ function IncomeList({ incomes, onDeleteIncome }) {
                 className="btn-delete"
                 onClick={() => onDeleteIncome(income.id)}
                 title="Delete income"
-                aria-label={`Delete ${income.title}`}
+                aria-label={`Delete ${income.description}`}
               >
                 ✕
               </button>

@@ -2,14 +2,24 @@
  * Chart Data Transformation Utilities
  * 
  * Functions to prepare expense data for visualization
+ * Color scheme: Income = Green (#16a34a), Expense = Red (#dc2626)
  */
 
 /**
- * Color palette for expense charts
- * Used consistently across all visualization components
+ * Semantic transaction colors for consistency across the app
+ * Used when displaying transaction types (income vs expense)
+ */
+export const TRANSACTION_COLORS = {
+  income: '#16a34a',    // Green
+  expense: '#dc2626'    // Red
+}
+
+/**
+ * Color palette for expense category charts
+ * Used for pie charts showing expense category breakdown
  */
 export const CHART_COLORS = [
-  '#5367AB', '#f9c74f', '#008000', '#ff6b6b',
+  '#5367AB', '#dc2626', '#16a34a', '#ff6b6b',
   '#4ecdc4', '#45b7d1', '#f7b731', '#5f27cd'
 ]
 
@@ -20,7 +30,7 @@ export const CHART_COLORS = [
  */
 export const preparePieChartData = (expenses) => {
   return expenses.map((expense, index) => ({
-    name: expense.title,
+    name: expense.description,
     value: expense.amount,
     color: CHART_COLORS[index % CHART_COLORS.length]
   }))
@@ -38,11 +48,11 @@ export const prepareBarChartData = (expenses) => {
     .sort((a, b) => b.amount - a.amount)
     .slice(0, 10)
     .map((expense) => ({
-      name: expense.title.length > maxLength
-        ? expense.title.substring(0, maxLength) + '...'
-        : expense.title,
+      name: expense.description.length > maxLength
+        ? expense.description.substring(0, maxLength) + '...'
+        : expense.description,
       amount: expense.amount,
-      fullName: expense.title
+      fullName: expense.description
     }))
 }
 

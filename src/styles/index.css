@@ -1,12 +1,26 @@
 :root {
+  /* Brand & Layout Colors */
   --color-primary: #5367AB;
-  --color-warning: #f9c74f;
-  --color-success: #008000;
-  --color-error: #dc2626;
   --color-light: #ffffff;
   --color-dark: #333;
   --color-border: #ddd;
   --color-background: #f8f9fa;
+  
+  /* Semantic Transaction Colors */
+  --color-income: #16a34a;        /* Green for income */
+  --color-income-light: rgba(22, 163, 74, 0.1);
+  --color-income-border: rgba(22, 163, 74, 0.2);
+  
+  --color-expense: #dc2626;       /* Red for expenses (NOT yellow) */
+  --color-expense-light: rgba(220, 38, 38, 0.1);
+  --color-expense-border: rgba(220, 38, 38, 0.2);
+  
+  /* Status Colors (mapped to semantic colors) */
+  --color-success: #16a34a;       /* Green - positive, income */
+  --color-error: #dc2626;         /* Red - errors, over-budget */
+  --color-warning: #dc2626;       /* Red - expenses (changed from yellow) */
+  --color-positive: #16a34a;      /* Green - positive balance */
+  --color-negative: #dc2626;      /* Red - negative balance */
   
   --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',

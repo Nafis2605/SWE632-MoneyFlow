@@ -9,7 +9,8 @@
  * @typedef {Object} Transaction
  * @property {string} id - Unique identifier for the transaction
  * @property {string} type - Transaction type: "income" or "expense"
- * @property {string} title - Name/description of the transaction
+ * @property {string} description - Name/description of the transaction
+ * @property {string} category - Category of the transaction (e.g., 'salary', 'groceries')
  * @property {number} amount - Transaction amount (in dollars)
  * @property {string} dateISO - ISO date string (YYYY-MM-DD) to avoid timezone issues
  */
@@ -22,12 +23,13 @@
 /**
  * Create a new transaction object
  * @param {string} type - Transaction type: "income" or "expense"
- * @param {string} title - Name/description of the transaction
+ * @param {string} description - Name/description of the transaction
+ * @param {string} category - Category of the transaction
  * @param {number} amount - Amount of the transaction
  * @param {string|Date} dateISO - Date of the transaction as ISO string (YYYY-MM-DD) or Date object (defaults to today)
  * @returns {Transaction} New transaction object
  */
-export const createTransaction = (type, title, amount, dateISO) => {
+export const createTransaction = (type, description, category, amount, dateISO) => {
   let isoDate = dateISO
   
   // Convert Date object to ISO string if needed
@@ -49,7 +51,8 @@ export const createTransaction = (type, title, amount, dateISO) => {
   return {
     id: generateId(),
     type: type.toLowerCase(),
-    title: title.trim(),
+    description: description.trim(),
+    category: category.toLowerCase(),
     amount: Math.max(0, parseFloat(amount)),
     dateISO: isoDate
   }
@@ -57,22 +60,24 @@ export const createTransaction = (type, title, amount, dateISO) => {
 
 /**
  * Create a new expense transaction (convenience function)
- * @param {string} title - Name/description of the expense
+ * @param {string} description - Name/description of the expense
+ * @param {string} category - Category of the expense
  * @param {number} amount - Amount of the expense
  * @returns {Transaction} New expense transaction object
  */
-export const createExpense = (title, amount) => {
-  return createTransaction('expense', title, amount)
+export const createExpense = (description, category, amount) => {
+  return createTransaction('expense', description, category, amount)
 }
 
 /**
  * Create a new income transaction (convenience function)
- * @param {string} title - Name/description of the income
+ * @param {string} description - Name/description of the income
+ * @param {string} category - Category of the income
  * @param {number} amount - Amount of the income
  * @returns {Transaction} New income transaction object
  */
-export const createIncome = (title, amount) => {
-  return createTransaction('income', title, amount)
+export const createIncome = (description, category, amount) => {
+  return createTransaction('income', description, category, amount)
 }
 
 /**

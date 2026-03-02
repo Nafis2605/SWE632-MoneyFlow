@@ -1,10 +1,12 @@
 import { useState } from 'react'
 import { getTodayISO } from '../utils/date'
+import { getCategoryOptions } from '../utils/categories'
 import '../styles/TransactionForm.css'
 
 function TransactionForm({ onAddIncome, onAddExpense }) {
   const [type, setType] = useState('income')
-  const [title, setTitle] = useState('')
+  const [description, setDescription] = useState('')
+  const [category, setCategory] = useState('')
   const [amount, setAmount] = useState('')
   const [date, setDate] = useState(getTodayISO())
   const [error, setError] = useState(null)
@@ -13,12 +15,31 @@ function TransactionForm({ onAddIncome, onAddExpense }) {
     e.preventDefault()
     setError(null)
 
+    // Validate all required fields
+    if (!description.trim()) {
+      setError(`${type === 'income' ? 'Income' : 'Expense'} description is required`)
+      return
+    }
+    if (!category) {
+      setError('Category is required')
+      return
+    }
+    if (isNaN(parseFloat(amount)) || parseFloat(amount) <= 0) {
+      setError('Amount must be greater than 0')
+      return
+    }
+    if (!date) {
+      setError('Date is required')
+      return
+    }
+
     // Pass date directly as ISO string (no conversion needed)
     const callback = type === 'income' ? onAddIncome : onAddExpense
-    const result = callback(title, parseFloat(amount), date)
+    const result = callback(description, category, parseFloat(amount), date)
     
     if (result.success) {
-      setTitle('')
+      setDescription('')
+      setCategory('')
       setAmount('')
       setDate(getTodayISO())
     } else {
@@ -28,29 +49,29 @@ function TransactionForm({ onAddIncome, onAddExpense }) {
 
   // Validation check: button is disabled if inputs are empty or invalid
   const isDisabled = 
-    !title.trim() || 
+    !description.trim() || 
+    !category ||
     !amount.trim() || 
     isNaN(parseFloat(amount)) || 
-    parseFloat(amount) < 0 ||
+    parseFloat(amount) <= 0 ||
     !date
 
   // Labels based on transaction type
   const labels = {
     income: {
-      title: 'Income Source',
-      placeholder: 'e.g., Salary, Freelance, Bonus',
-      label: 'Income Source',
+      description: 'Income Description',
+      descriptionPlaceholder: 'e.g., Salary, Freelance work, Bonus',
       button: 'Add Income'
     },
     expense: {
-      title: 'Expense Name',
-      placeholder: 'e.g., Groceries, Rent, Utilities',
-      label: 'Expense Name',
+      description: 'Expense Description',
+      descriptionPlaceholder: 'e.g., Grocery shopping, Rent payment',
       button: 'Add Expense'
     }
   }
 
   const currentLabels = labels[type]
+  const categoryOptions = getCategoryOptions(type)
 
   return (
     <section className="transaction-form-section">
@@ -64,6 +85,7 @@ function TransactionForm({ onAddIncome, onAddExpense }) {
             className={`toggle-btn ${type === 'income' ? 'active' : ''}`}
             onClick={() => {
               setType('income')
+              setCategory('')
               setError(null)
             }}
             aria-pressed={type === 'income'}
@@ -75,6 +97,7 @@ function TransactionForm({ onAddIncome, onAddExpense }) {
             className={`toggle-btn ${type === 'expense' ? 'active' : ''}`}
             onClick={() => {
               setType('expense')
+              setCategory('')
               setError(null)
             }}
             aria-pressed={type === 'expense'}
@@ -85,22 +108,54 @@ function TransactionForm({ onAddIncome, onAddExpense }) {
       </div>
 
       <form className="transaction-form" onSubmit={handleSubmit}>
+        {/* Description Field */}
         <div className="form-group">
-          <label htmlFor="transaction-title">{currentLabels.label}:</label>
+          <label htmlFor="transaction-description">
+            {currentLabels.description}:
+            <span className="required" aria-label="required">*</span>
+          </label>
           <input
-            id="transaction-title"
+            id="transaction-description"
             type="text"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            placeholder={currentLabels.placeholder}
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            placeholder={currentLabels.descriptionPlaceholder}
             className="form-input"
             maxLength="100"
-            aria-label={`${type} ${currentLabels.label.toLowerCase()}`}
+            aria-label={currentLabels.description}
+            required
           />
         </div>
 
+        {/* Category Field */}
         <div className="form-group">
-          <label htmlFor="transaction-amount">Amount:</label>
+          <label htmlFor="transaction-category">
+            Category:
+            <span className="required" aria-label="required">*</span>
+          </label>
+          <select
+            id="transaction-category"
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+            className="form-input form-select"
+            aria-label="Transaction category"
+            required
+          >
+            <option value="">Select a category</option>
+            {categoryOptions.map((opt) => (
+              <option key={opt.value} value={opt.value}>
+                {opt.label}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Amount Field */}
+        <div className="form-group">
+          <label htmlFor="transaction-amount">
+            Amount:
+            <span className="required" aria-label="required">*</span>
+          </label>
           <div className="input-wrapper">
             <span className="currency-symbol">$</span>
             <input
@@ -112,20 +167,26 @@ function TransactionForm({ onAddIncome, onAddExpense }) {
               step="0.01"
               min="0"
               className="form-input"
-              aria-label={`${type} amount`}
+              aria-label="Transaction amount"
+              required
             />
           </div>
         </div>
 
+        {/* Date Field */}
         <div className="form-group">
-          <label htmlFor="transaction-date">Date:</label>
+          <label htmlFor="transaction-date">
+            Date:
+            <span className="required" aria-label="required">*</span>
+          </label>
           <input
             id="transaction-date"
             type="date"
             value={date}
             onChange={(e) => setDate(e.target.value)}
             className="form-input"
-            aria-label={`${type} date`}
+            aria-label="Transaction date"
+            required
           />
         </div>
 
@@ -145,3 +206,4 @@ function TransactionForm({ onAddIncome, onAddExpense }) {
 }
 
 export default TransactionForm
+

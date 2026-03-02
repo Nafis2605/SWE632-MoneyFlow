@@ -25,7 +25,7 @@ function RecentTransactions({ transactions }) {
             <li key={transaction.id} className="transaction-item">
               <div className="transaction-main">
                 <div className="transaction-header">
-                  <span className="transaction-title">{transaction.title}</span>
+                  <span className="transaction-title">{transaction.description}</span>
                   <span className={`transaction-badge transaction-badge-${transaction.type}`}>
                     {transaction.type === 'income' ? 'Income' : 'Expense'}
                   </span>

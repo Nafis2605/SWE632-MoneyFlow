@@ -127,13 +127,13 @@
 }
 
 .transaction-type.income {
-  background-color: #dffce6;
-  color: #065f46;
+  background-color: var(--color-income-light);
+  color: var(--color-income);
 }
 
 .transaction-type.expense {
-  background-color: #fef3c7;
-  color: #92400e;
+  background-color: var(--color-expense-light);
+  color: var(--color-expense);
 }
 
 .transaction-amount {
@@ -145,11 +145,11 @@
 }
 
 .transaction-amount.income {
-  color: var(--color-success);
+  color: var(--color-income);
 }
 
 .transaction-amount.expense {
-  color: var(--color-warning);
+  color: var(--color-expense);
 }
 
 /* Empty State */

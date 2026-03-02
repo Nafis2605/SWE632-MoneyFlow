@@ -134,30 +134,37 @@
  * 
  * Progress Bar:
  *   height: 24px
- *   background: linear-gradient(90deg, warning, success)
+ *   background: linear-gradient(90deg, #dc2626 (red), #16a34a (green))
  *   border-radius: 12px
  * 
  * 
- * COLOR USAGE:
+ * COLOR USAGE (SEMANTIC):
  * 
- * Primary (#f94144):
- *   - Page title
+ * Primary (#5367AB):
+ *   - Brand/UI elements
  *   - Buttons
- *   - Delete icons
- *   - Over-budget warning
+ *   - Navigation
  * 
- * Warning (#f9c74f):
- *   - Expense amounts
- *   - Progress bar (partial)
+ * Income (#16a34a - Green):
+ *   - Income amounts and values
+ *   - Income badges and labels
+ *   - Positive balance (if budget not exceeded)
+ *   - Progress bar (right side - good spending)
  * 
- * Success (#008000):
- *   - Income amount
- *   - Remaining budget (if positive)
- *   - Progress bar (partial)
+ * Expense (#dc2626 - Red):
+ *   - Expense amounts and values
+ *   - Expense badges and labels
+ *   - Over-budget warnings
+ *   - Progress bar (left side - spending)
+ * 
+ * Error/Negative (#dc2626 - Red):
+ *   - Negative balance
+ *   - Errors
+ *   - Warnings
  * 
  * Light (#f8f9fa):
  *   - Background
- * 
+ *
  * 
  * SPACING HIERARCHY:
  * 

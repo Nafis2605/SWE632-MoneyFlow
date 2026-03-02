@@ -1,0 +1,64 @@
+/**
+ * Centralized Theme System
+ * 
+ * Semantic color definitions for consistent UI across the app
+ * Income = Green, Expense = Red
+ */
+
+:root {
+  /* Semantic Transaction Colors */
+  --color-income: #16a34a;        /* Green for income */
+  --color-income-light: rgba(22, 163, 74, 0.1);
+  --color-income-border: rgba(22, 163, 74, 0.2);
+  
+  --color-expense: #dc2626;       /* Red for expenses (NOT yellow) */
+  --color-expense-light: rgba(220, 38, 38, 0.1);
+  --color-expense-border: rgba(220, 38, 38, 0.2);
+  
+  /* Status Colors */
+  --color-positive: #16a34a;      /* Green for positive balance */
+  --color-negative: #dc2626;      /* Red for negative/over-budget */
+  
+  /* Legacy Color Variables (for backward compatibility) */
+  --color-success: #16a34a;       /* Maps to green/income */
+  --color-error: #dc2626;         /* Maps to red/expense warnings */
+  --color-warning: #dc2626;       /* Changed from yellow to red for expenses */
+}
+
+/* Chart Color Palette */
+.chart-colors {
+  --chart-income: #16a34a;
+  --chart-expense: #dc2626;
+  --chart-neutral: #64748b;
+  --chart-background: #f8f9fa;
+}
+
+/* Badge/Tag Color System */
+.badge-income {
+  background-color: var(--color-income-light);
+  color: var(--color-income);
+  border-color: var(--color-income-border);
+}
+
+.badge-expense {
+  background-color: var(--color-expense-light);
+  color: var(--color-expense);
+  border-color: var(--color-expense-border);
+}
+
+/* Text Color System */
+.text-income {
+  color: var(--color-income);
+}
+
+.text-expense {
+  color: var(--color-expense);
+}
+
+.text-positive {
+  color: var(--color-positive);
+}
+
+.text-negative {
+  color: var(--color-negative);
+}

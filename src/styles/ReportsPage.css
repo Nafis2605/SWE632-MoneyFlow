@@ -163,11 +163,11 @@
 }
 
 .summary-card.expense {
-  border-top-color: var(--color-warning, #f9c74f);
+  border-top-color: var(--color-expense, #dc2626);
   background: linear-gradient(
     to bottom right,
-    rgba(249, 199, 79, 0.05),
-    rgba(249, 199, 79, 0.02)
+    rgba(220, 38, 38, 0.05),
+    rgba(220, 38, 38, 0.02)
   );
 }
 
@@ -211,7 +211,7 @@
 }
 
 .summary-card.expense .card-value {
-  color: var(--color-warning, #f9c74f);
+  color: var(--color-expense, #dc2626);
 }
 
 .summary-card.balance.negative .card-value {
@@ -329,7 +329,7 @@
 }
 
 .summary-table td.expense-value {
-  color: var(--color-warning, #f9c74f);
+  color: var(--color-expense, #dc2626);
   font-weight: 600;
   text-align: right;
   font-size: 1.1rem;

@@ -26,17 +26,18 @@ export const useBudgetState = () => {
   /**
    * Add a new income transaction
    * Creates immutable copy of transactions array
-   * @param {string} title - Income title
+   * @param {string} description - Income description
+   * @param {string} category - Income category
    * @param {number} amount - Income amount
    * @param {string|Date} date - ISO date string or Date object (defaults to today)
    */
-  const addIncome = useCallback((title, amount, date) => {
-    const validation = validateTransaction(title, amount)
+  const addIncome = useCallback((description, category, amount, date) => {
+    const validation = validateTransaction(description, amount)
     if (!validation.isValid) {
       return { success: false, errors: validation.errors }
     }
 
-    const newIncome = createTransaction('income', title, amount, date)
+    const newIncome = createTransaction('income', description, category, amount, date)
     setTransactions(prevTransactions => [...prevTransactions, newIncome])
     return { success: true, transaction: newIncome }
   }, [])
@@ -44,17 +45,18 @@ export const useBudgetState = () => {
   /**
    * Add a new expense transaction
    * Creates immutable copy of transactions array
-   * @param {string} title - Expense title
+   * @param {string} description - Expense description
+   * @param {string} category - Expense category
    * @param {number} amount - Expense amount
    * @param {string|Date} date - ISO date string or Date object (defaults to today)
    */
-  const addExpense = useCallback((title, amount, date) => {
-    const validation = validateTransaction(title, amount)
+  const addExpense = useCallback((description, category, amount, date) => {
+    const validation = validateTransaction(description, amount)
     if (!validation.isValid) {
       return { success: false, errors: validation.errors }
     }
 
-    const newExpense = createTransaction('expense', title, amount, date)
+    const newExpense = createTransaction('expense', description, category, amount, date)
     setTransactions(prevTransactions => [...prevTransactions, newExpense])
     return { success: true, transaction: newExpense }
   }, [])

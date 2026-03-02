@@ -158,7 +158,7 @@ export const getAvailableMonths = (transactions) => {
  */
 export const generateTransactionCSV = (transactions) => {
   // CSV Headers
-  const headers = ['Date', 'Title', 'Type', 'Amount']
+  const headers = ['Date', 'Description', 'Category', 'Type', 'Amount']
   
   // Escape CSV values to handle commas and quotes
   const escapeCSVValue = (value) => {
@@ -171,7 +171,8 @@ export const generateTransactionCSV = (transactions) => {
   // Convert transactions to CSV rows
   const rows = transactions.map(transaction => [
     formatDate(transaction.dateISO),
-    escapeCSVValue(transaction.title),
+    escapeCSVValue(transaction.description),
+    escapeCSVValue(transaction.category),
     transaction.type.charAt(0).toUpperCase() + transaction.type.slice(1),
     `$${transaction.amount.toFixed(2)}`
   ])
@@ -304,7 +305,7 @@ export const generateTransactionPDF = (transactions, summary, filterInfo = '') =
   const colAmount = margin + 135
   
   doc.text('Date', colDate, yPosition)
-  doc.text('Title', colTitle, yPosition)
+  doc.text('Description', colTitle, yPosition)
   doc.text('Type', colType, yPosition)
   doc.text('Amount', colAmount, yPosition)
   yPosition += lineHeight
@@ -325,7 +326,7 @@ export const generateTransactionPDF = (transactions, summary, filterInfo = '') =
       // Repeat headers on new page
       doc.setFont(undefined, 'bold')
       doc.text('Date', colDate, yPosition)
-      doc.text('Title', colTitle, yPosition)
+      doc.text('Description', colTitle, yPosition)
       doc.text('Type', colType, yPosition)
       doc.text('Amount', colAmount, yPosition)
       yPosition += lineHeight
@@ -338,8 +339,8 @@ export const generateTransactionPDF = (transactions, summary, filterInfo = '') =
     const type = transaction.type.charAt(0).toUpperCase() + transaction.type.slice(1)
     const amount = `$${transaction.amount.toFixed(2)}`
     
-    // Handle title wrapping
-    const wrappedTitle = doc.splitTextToSize(transaction.title, 55)
+    // Handle description wrapping
+    const wrappedTitle = doc.splitTextToSize(transaction.description, 55)
     
     doc.text(date, colDate, yPosition)
     doc.text(wrappedTitle, colTitle, yPosition)
