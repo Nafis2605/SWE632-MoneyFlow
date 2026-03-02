@@ -1,90 +1,37 @@
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { useBudgetState } from './hooks/useBudgetState'
-import Header from './components/Header'
-import IncomeForm from './components/IncomeInput'
-import IncomeList from './components/IncomeList'
-import ExpenseForm from './components/ExpenseForm'
-import ExpenseList from './components/ExpenseList'
-import BudgetSummary from './components/BudgetSummary'
-import RecentTransactions from './components/RecentTransactions'
-import ExpenseVisualization from './components/ExpenseVisualization'
+import Navigation from './components/Navigation'
+import HomePage from './pages/HomePage'
+import DashboardPage from './pages/DashboardPage'
+import TransactionsPage from './pages/TransactionsPage'
+import ReportsPage from './pages/ReportsPage'
 import './styles/App.css'
 
 function App() {
   const budgetState = useBudgetState()
 
   return (
-    <div className="app">
-      <Header />
-      
-      <main className="main-content">
-        <div className="page-header">
-          <h1>Budget Planner</h1>
-          <p className="page-description">
-            Manage your income and expenses to track your budget at a glance
-          </p>
-        </div>
-
-        <div className="layout-container">
-          {/* Left Column: Income & Expense Input */}
-          <section className="section-column input-column">
-            <div className="section-wrapper">
-              <IncomeForm 
-                onAddIncome={budgetState.addIncome}
-              />
-            </div>
-
-            <div className="section-wrapper">
-              <ExpenseForm 
-                onAddExpense={budgetState.addExpense}
-              />
-            </div>
-          </section>
-
-          {/* Right Column: Summary & Transactions */}
-          <section className="section-column content-column">
-            <div className="section-wrapper">
-              <BudgetSummary
-                income={budgetState.totalIncome}
-                totalExpenses={budgetState.totalExpenses}
-                remainingBudget={budgetState.remainingBudget}
-              />
-            </div>
-
-            <div className="section-wrapper">
-              <IncomeList
-                incomes={budgetState.incomeTransactions}
-                onDeleteIncome={budgetState.deleteIncome}
-              />
-            </div>
-
-            <div className="section-wrapper">
-              <ExpenseList
-                expenses={budgetState.expenses}
-                onDeleteExpense={budgetState.deleteExpense}
-              />
-            </div>
-          </section>
-        </div>
-
-        {/* Full Width: Recent Activity */}
-        <div className="recent-activity-container">
-          <div className="section-wrapper">
-            <RecentTransactions
-              transactions={budgetState.transactions}
-            />
-          </div>
-        </div>
-
-        {/* Full Width: Expense Visualization */}
-        <div className="visualization-container">
-          <div className="section-wrapper">
-            <ExpenseVisualization
-              expenses={budgetState.expenses}
-            />
-          </div>
-        </div>
-      </main>
-    </div>
+    <Router>
+      <div className="app">
+        <Navigation />
+        
+        <Routes>
+          <Route path="/" element={<HomePage budgetState={budgetState} />} />
+          <Route 
+            path="/dashboard" 
+            element={<DashboardPage budgetState={budgetState} />} 
+          />
+          <Route 
+            path="/transactions" 
+            element={<TransactionsPage transactions={budgetState.transactions} />} 
+          />
+          <Route 
+            path="/reports" 
+            element={<ReportsPage transactions={budgetState.transactions} />} 
+          />
+        </Routes>
+      </div>
+    </Router>
   )
 }
 
