@@ -90,14 +90,13 @@
 
 .progress-bar {
   height: 100%;
-  background: linear-gradient(90deg, var(--color-success) 0%, #f59e0b 50%, var(--color-error) 100%);
-  transition: width 0.3s ease;
+  transition: width 0.3s ease, background-color 0.3s ease;
   border-radius: 12px;
   min-width: 0;
 }
 
 .progress-bar.over {
-  background: var(--color-error);
+  /* Over budget styling is handled via inline backgroundColor in component */
 }
 
 .warning-text {

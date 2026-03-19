@@ -6,6 +6,17 @@ function BudgetSummary({ income, totalExpenses, remainingBudget }) {
   const overBudget = isOverBudget(remainingBudget)
   const overAmount = getOverBudgetAmount(remainingBudget)
 
+  // Determine progress bar color based on budget usage percentage
+  const getProgressBarColor = () => {
+    if (percentage < 50) {
+      return '#16a34a' // Green - low usage
+    } else if (percentage < 80) {
+      return '#f59e0b' // Amber - medium usage
+    } else {
+      return '#dc2626' // Red - high usage or over budget
+    }
+  }
+
   return (
     <section className="budget-summary-section">
       <h2>Budget Summary</h2>
@@ -38,7 +49,10 @@ function BudgetSummary({ income, totalExpenses, remainingBudget }) {
         <div className="progress-bar-container">
           <div
             className={`progress-bar ${percentage > 100 ? 'over' : ''}`}
-            style={{ width: `${Math.min(percentage, 100)}%` }}
+            style={{ 
+              width: `${Math.min(percentage, 100)}%`,
+              backgroundColor: getProgressBarColor()
+            }}
           />
         </div>
         {overBudget && (

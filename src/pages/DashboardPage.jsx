@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import ExpenseVisualization from '../components/ExpenseVisualization'
+import MonthlyCategoryTrends from '../components/MonthlyCategoryTrends'
 import BudgetSummary from '../components/BudgetSummary'
 import FiltersPanel from '../components/FiltersPanel'
 import TransactionListWithActions from '../components/TransactionListWithActions'
@@ -65,6 +66,15 @@ function DashboardPage({ budgetState }) {
                 expenses={filteredExpenses}
               />
             )}
+          </div>
+        </div>
+
+        {/* Monthly Category Trends */}
+        <div className="dashboard-section trends-section">
+          <div className="section-wrapper">
+            <MonthlyCategoryTrends
+              expenses={filteredExpenses}
+            />
           </div>
         </div>
 
