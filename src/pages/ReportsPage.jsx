@@ -6,13 +6,16 @@ import { getSortedTransactions, downloadTransactionCSV, downloadTransactionPDF, 
 import FiltersPanel from '../components/FiltersPanel'
 import TransactionListWithActions from '../components/TransactionListWithActions'
 import ExpenseVisualization from '../components/ExpenseVisualization'
+import PDFExportVisualization from '../components/PDFExportVisualization'
 import { getDefaultFilters, applyFilters } from '../utils/filterModel'
 import { calculateBudgetSummary } from '../utils/budgetCalculations'
 import { captureChartsAsImages } from '../utils/chartExport'
 
 function ReportsPage({ budgetState }) {
   const [filters, setFilters] = useState(getDefaultFilters())
-  const pieChartRef = useRef(null)
+  const [isExporting, setIsExporting] = useState(false)
+  const chartsContainerRef = useRef(null)
+  const pdfExportContainerRef = useRef(null)
   const transactions = budgetState.transactions
 
   // Apply filters and get filtered transactions
@@ -71,27 +74,58 @@ function ReportsPage({ budgetState }) {
       return
     }
     
-    const summaryData = {
-      totalIncome,
-      totalExpenses,
-      netBalance,
-      transactionCount: filteredTransactions.length,
-      expenseRatio: balancePercentage,
-      savingsRate: totalIncome > 0 ? (((totalIncome - totalExpenses) / totalIncome) * 100) : 0
-    }
-
-    // Capture charts if they exist
-    const chartImages = {}
-    try {
-      const capturedImages = await captureChartsAsImages({
-        pieChart: pieChartRef.current
-      })
-      if (capturedImages.pieChart) chartImages.pieChart = capturedImages.pieChart
-    } catch (error) {
-      console.warn('Could not capture charts for PDF:', error)
-    }
+    setIsExporting(true)
     
-    downloadEnhancedTransactionPDF(filteredTransactions, summaryData, `${generateFileName()}.pdf`, generateFilterInfo(), chartImages)
+    try {
+      const summaryData = {
+        totalIncome,
+        totalExpenses,
+        netBalance,
+        transactionCount: filteredTransactions.length,
+        expenseRatio: balancePercentage,
+        savingsRate: totalIncome > 0 ? (((totalIncome - totalExpenses) / totalIncome) * 100) : 0
+      }
+
+      // Capture charts from PDF export container if it exists and has expenses
+      const chartImages = {}
+      if (pdfExportContainerRef.current && expenseTransactions.length > 0) {
+        try {
+          // Make the container temporarily visible for rendering
+          const container = pdfExportContainerRef.current
+          container.style.position = 'absolute'
+          container.style.left = '0'
+          container.style.top = '-9999px'
+          container.style.visibility = 'visible'
+          
+          // Wait for charts to fully render before capture
+          await new Promise(resolve => setTimeout(resolve, 1200))
+          
+          // Capture the entire PDF export visualization container
+          const capturedImages = await captureChartsAsImages({
+            pdfVisualization: pdfExportContainerRef.current
+          }, true, { scale: 2, minHeight: 1000, minWidth: 1000 })
+          
+          // Hide container again after capture
+          container.style.position = 'fixed'
+          container.style.left = '-9999px'
+          container.style.visibility = 'hidden'
+          
+          if (capturedImages.pdfVisualization) {
+            chartImages.chartsVisualization = capturedImages.pdfVisualization
+          }
+        } catch (error) {
+          console.warn('Could not capture PDF visualization:', error)
+          // Continue with PDF export even if chart capture fails
+        }
+      }
+      
+      downloadEnhancedTransactionPDF(filteredTransactions, summaryData, `${generateFileName()}.pdf`, generateFilterInfo(), chartImages)
+    } catch (error) {
+      console.error('Error during PDF export:', error)
+      alert('An error occurred during PDF export. Please try again.')
+    } finally {
+      setIsExporting(false)
+    }
   }
 
   return (
@@ -121,11 +155,21 @@ function ReportsPage({ budgetState }) {
             </div>
             {filteredTransactions.length > 0 && (
               <div className="export-buttons">
-                <button className="export-button" onClick={handleExportCSV} title="Export filtered transactions as CSV">
+                <button 
+                  className="export-button" 
+                  onClick={handleExportCSV}
+                  disabled={isExporting}
+                  title="Export filtered transactions as CSV"
+                >
                   ↓ CSV
                 </button>
-                <button className="export-button" onClick={handleExportPDF} title="Export filtered transactions as PDF">
-                  ↓ PDF
+                <button 
+                  className="export-button" 
+                  onClick={handleExportPDF}
+                  disabled={isExporting}
+                  title="Export filtered transactions as PDF"
+                >
+                  {isExporting ? '⏳ Generating...' : '↓ PDF'}
                 </button>
               </div>
             )}
@@ -205,7 +249,7 @@ function ReportsPage({ budgetState }) {
 
               {/* Charts Section - Only show if there are expenses */}
               {expenseTransactions.length > 0 && (
-                <div ref={pieChartRef} style={{marginBottom: '2rem'}}>
+                <div ref={chartsContainerRef} style={{ marginBottom: '2rem' }}>
                   <ExpenseVisualization expenses={expenseTransactions} />
                 </div>
               )}
@@ -246,6 +290,27 @@ function ReportsPage({ budgetState }) {
             </>
           )}
         </div>
+
+        {/* Hidden PDF Export Container - Optimized layout for PDF capture */}
+        {expenseTransactions.length > 0 && (
+          <div
+            ref={pdfExportContainerRef}
+            style={{
+              position: 'absolute',
+              left: '-9999px',
+              top: '-9999px',
+              width: '1000px',
+              backgroundColor: '#ffffff',
+              padding: '0',
+              visibility: 'hidden',
+              pointerEvents: 'none',
+              zIndex: -1,
+              minHeight: 'auto'
+            }}
+          >
+            <PDFExportVisualization expenses={expenseTransactions} />
+          </div>
+        )}
       </div>
     </div>
   )

@@ -1,6 +1,7 @@
 /* eslint-disable-next-line import/no-unresolved */
 import { jsPDF } from 'jspdf'
 import { formatDate, formatISODate, compareISO, getYearFromISO, getMonthFromISO, formatMonthYear } from './date'
+import { groupTransactionsByCategory } from './aggregate'
 
 /**
  * Utility function to format currency
@@ -384,19 +385,59 @@ export const generateEnhancedTransactionPDF = (transactions, summary, filterInfo
   const pageHeight = doc.internal.pageSize.getHeight()
   const margin = 15
   const lineHeight = 7
+  const sectionSpacing = 8
   let yPosition = margin
 
-  // PRIMARY COLOR
+  // COLOR SCHEME - Using basic colors that jsPDF handles well
   const primaryColor = [83, 103, 171] // #5367AB
   const textDarkColor = [51, 51, 51]
   const textLightColor = [102, 102, 102]
+  const incomeColor = [22, 163, 74] // Green for income
+  const expenseColor = [220, 38, 38] // Red for expense
+  const headerBgColor = [240, 242, 248]
 
-  // ===== TITLE SECTION =====
-  doc.setFontSize(24)
+  // Helper function to add section header (without emoji to avoid encoding issues)
+  const addSectionHeader = (title) => {
+    doc.setDrawColor(...primaryColor)
+    doc.setLineWidth(0.5)
+    doc.line(margin, yPosition, pageWidth - margin, yPosition)
+    yPosition += 4
+
+    doc.setFontSize(13)
+    doc.setFont(undefined, 'bold')
+    doc.setTextColor(...primaryColor)
+    // Use plain text without emoji to avoid PDF encoding corruption
+    doc.text(title, margin, yPosition)
+    yPosition += 8
+  }
+
+  // Helper function to check if we need a new page
+  const checkPageBreak = (requiredSpace = 50) => {
+    if (yPosition + requiredSpace > pageHeight - 10) {
+      doc.addPage()
+      yPosition = margin
+    }
+  }
+
+  // Helper function to calculate aspect-ratio-preserving dimensions
+  const scaleImageToFit = (maxWidth, maxHeight, imageRatio) => {
+    // imageRatio = image width / image height
+    const widthLimited = maxHeight * imageRatio
+    const heightLimited = maxWidth / imageRatio
+
+    if (widthLimited <= maxWidth) {
+      return { width: widthLimited, height: maxHeight }
+    } else {
+      return { width: maxWidth, height: heightLimited }
+    }
+  }
+
+  // ===== PAGE 1: TITLE SECTION =====
+  doc.setFontSize(28)
   doc.setFont(undefined, 'bold')
   doc.setTextColor(...textDarkColor)
   doc.text('Financial Report', margin, yPosition)
-  yPosition += 12
+  yPosition += 14
 
   // Date and Filter Info
   doc.setFontSize(10)
@@ -411,24 +452,15 @@ export const generateEnhancedTransactionPDF = (transactions, summary, filterInfo
   yPosition += 6
 
   if (filterInfo) {
-    doc.setFont(undefined, 'italic')
+    doc.setFont(undefined, 'normal')
     doc.text(`Date Range: ${filterInfo}`, margin, yPosition)
     yPosition += 6
   }
 
-  yPosition += 4
+  yPosition += sectionSpacing
 
   // ===== SUMMARY SECTION =====
-  doc.setDrawColor(...primaryColor)
-  doc.setLineWidth(0.5)
-  doc.line(margin, yPosition, pageWidth - margin, yPosition)
-  yPosition += 4
-
-  doc.setFontSize(13)
-  doc.setFont(undefined, 'bold')
-  doc.setTextColor(...primaryColor)
-  doc.text('Summary', margin, yPosition)
-  yPosition += 8
+  addSectionHeader('Summary')
 
   // Summary data in two columns
   doc.setFontSize(10)
@@ -452,103 +484,159 @@ export const generateEnhancedTransactionPDF = (transactions, summary, filterInfo
 
   summaryData.forEach((item, index) => {
     doc.setFont(undefined, 'bold')
+    doc.setTextColor(...primaryColor)
     doc.text(item.label + ':', leftColX, yPosition)
+    
     doc.setFont(undefined, 'normal')
-    doc.text(item.value, leftColX + 40, yPosition)
+    doc.setTextColor(...textDarkColor)
+    doc.text(item.value, leftColX + 45, yPosition)
 
-    doc.setFont(undefined, 'bold')
-    doc.text(advancedData[index].label + ':', rightColX, yPosition)
-    doc.setFont(undefined, 'normal')
-    doc.text(advancedData[index].value, rightColX + 40, yPosition)
-
-    yPosition += lineHeight + 1
-  })
-
-  yPosition += 5
-
-  // ===== CHARTS SECTION =====
-  if (chartImages.pieChart || chartImages.barChart) {
-    // Check if we need new page
-    if (yPosition > pageHeight - 100) {
-      doc.addPage()
-      yPosition = margin
-    }
-
-    doc.setDrawColor(...primaryColor)
-    doc.setLineWidth(0.5)
-    doc.line(margin, yPosition, pageWidth - margin, yPosition)
-    yPosition += 4
-
-    doc.setFontSize(13)
     doc.setFont(undefined, 'bold')
     doc.setTextColor(...primaryColor)
-    doc.text('Visualizations', margin, yPosition)
-    yPosition += 8
+    doc.text(advancedData[index].label + ':', rightColX, yPosition)
+    
+    doc.setFont(undefined, 'normal')
+    doc.setTextColor(...textDarkColor)
+    doc.text(advancedData[index].value, rightColX + 45, yPosition)
 
-    const chartWidth = (pageWidth - margin * 2) / 2 - 5
-    const chartHeight = 60
+    yPosition += lineHeight + 2
+  })
 
-    // Pie Chart
-    if (chartImages.pieChart) {
-      doc.setFontSize(11)
-      doc.setFont(undefined, 'bold')
-      doc.setTextColor(...textDarkColor)
-      doc.text('Expense Breakdown', margin, yPosition)
-      yPosition += 3
+  yPosition += sectionSpacing
 
-      try {
-        doc.addImage(chartImages.pieChart, 'PNG', margin, yPosition, chartWidth, chartHeight)
-      } catch (error) {
-        console.error('Error adding pie chart:', error)
-        doc.setTextColor(255, 0, 0)
-        doc.setFontSize(9)
-        doc.text('Chart could not be added', margin, yPosition)
-      }
-    }
-
-    // Bar Chart
-    if (chartImages.barChart) {
-      const barChartX = margin + chartWidth + 10
-      
-      doc.setFontSize(11)
-      doc.setFont(undefined, 'bold')
-      doc.setTextColor(...textDarkColor)
-      doc.text('Top Expenses', barChartX, yPosition)
-      yPosition += 3
-
-      try {
-        doc.addImage(chartImages.barChart, 'PNG', barChartX, yPosition, chartWidth, chartHeight)
-      } catch (error) {
-        console.error('Error adding bar chart:', error)
-        doc.setTextColor(255, 0, 0)
-        doc.setFontSize(9)
-        doc.text('Chart could not be added', barChartX, yPosition)
-      }
-    }
-
-    yPosition += chartHeight + 10
-  }
-
-  // Check if we need a new page for transactions
-  if (yPosition > pageHeight - 50) {
+  // ===== CHARTS SECTION =====
+  const hasCharts = chartImages.chartsVisualization || chartImages.pieChart || chartImages.barChart
+  if (hasCharts) {
+    // Start charts on a new page for better visibility and layout
     doc.addPage()
     yPosition = margin
+    
+    addSectionHeader('Visualizations')
+
+    try {
+      const chartImage = chartImages.chartsVisualization || chartImages.pieChart
+      if (chartImage) {
+        // Create a new Image object to get actual dimensions
+        const img = new Image()
+        img.src = chartImage
+        
+        // Calculate optimal dimensions for full-page chart display
+        // Charts from PDFExportVisualization are ~1000px wide
+        // We want to use most of the page width (minus margins)
+        const maxChartWidth = pageWidth - margin * 2
+        
+        // For the combined visualization, estimate the aspect ratio
+        // The PDFExportVisualization container has pie + bar + stats cards vertically stacked
+        // Typical captured height would be around 1200-1400px for 1000px width
+        // So aspect ratio is roughly 1000/1300 = 0.77
+        const estimatedAspectRatio = 1000 / 1300 // width / height
+        
+        // Calculate height based on aspect ratio and available space
+        let chartWidth = maxChartWidth
+        let chartHeight = chartWidth / estimatedAspectRatio
+        
+        // Ensure we don't exceed page height too much (leave room for next section)
+        const maxAvailableHeight = pageHeight - margin - 40
+        if (chartHeight > maxAvailableHeight) {
+          chartHeight = maxAvailableHeight
+          chartWidth = chartHeight * estimatedAspectRatio
+        }
+        
+        // Center horizontally
+        const chartX = margin + (maxChartWidth - chartWidth) / 2
+        
+        doc.addImage(chartImage, 'PNG', chartX, yPosition, chartWidth, chartHeight)
+        yPosition += chartHeight + 15
+        
+      } else if (chartImages.barChart) {
+        // Fallback to bar chart if pie chart not available
+        const maxChartWidth = pageWidth - margin * 2
+        const chartHeight = 120  // Reasonable height for single chart
+        const chartWidth = maxChartWidth
+        const chartX = margin
+        
+        doc.addImage(chartImages.barChart, 'PNG', chartX, yPosition, chartWidth, chartHeight)
+        yPosition += chartHeight + 15
+      }
+    } catch (error) {
+      console.error('Error adding charts to PDF:', error)
+      // Add fallback message instead of chart
+      doc.setFontSize(10)
+      doc.setFont(undefined, 'italic')
+      doc.setTextColor(...textLightColor)
+      doc.text('Charts are available in the digital report but could not be embedded in PDF format.', margin, yPosition)
+      yPosition += 12
+    }
+
+    yPosition += sectionSpacing
+  }
+
+  // ===== CATEGORY SUMMARY SECTION =====
+  // Group transactions by category and type
+  const incomeByCategory = groupTransactionsByCategory(
+    transactions.filter(t => t.type === 'income'),
+    'income'
+  )
+  const expenseByCategory = groupTransactionsByCategory(
+    transactions.filter(t => t.type === 'expense'),
+    'expense'
+  )
+
+  if (incomeByCategory.length > 0 || expenseByCategory.length > 0) {
+    checkPageBreak(60)
+    addSectionHeader('Category Summary')
+
+    // Expense Summary
+    if (expenseByCategory.length > 0) {
+      doc.setFontSize(11)
+      doc.setFont(undefined, 'bold')
+      doc.setTextColor(...expenseColor)
+      doc.text('Expenses by Category', margin, yPosition)
+      yPosition += 6
+
+      doc.setFontSize(9)
+      doc.setFont(undefined, 'normal')
+      doc.setTextColor(...textDarkColor)
+
+      expenseByCategory.forEach(category => {
+        const categoryLine = `  ${category.label}: $${category.amount.toFixed(2)} (${category.count} transaction${category.count !== 1 ? 's' : ''})`
+        doc.text(categoryLine, margin, yPosition)
+        yPosition += lineHeight
+      })
+
+      yPosition += 4
+    }
+
+    // Income Summary
+    if (incomeByCategory.length > 0) {
+      doc.setFontSize(11)
+      doc.setFont(undefined, 'bold')
+      doc.setTextColor(...incomeColor)
+      doc.text('Income by Category', margin, yPosition)
+      yPosition += 6
+
+      doc.setFontSize(9)
+      doc.setFont(undefined, 'normal')
+      doc.setTextColor(...textDarkColor)
+
+      incomeByCategory.forEach(category => {
+        const categoryLine = `  ${category.label}: $${category.amount.toFixed(2)} (${category.count} transaction${category.count !== 1 ? 's' : ''})`
+        doc.text(categoryLine, margin, yPosition)
+        yPosition += lineHeight
+      })
+
+      yPosition += 4
+    }
+
+    yPosition += sectionSpacing
   }
 
   // ===== TRANSACTIONS SECTION =====
-  doc.setDrawColor(...primaryColor)
-  doc.setLineWidth(0.5)
-  doc.line(margin, yPosition, pageWidth - margin, yPosition)
-  yPosition += 4
-
-  doc.setFontSize(13)
-  doc.setFont(undefined, 'bold')
-  doc.setTextColor(...primaryColor)
-  doc.text('Transaction Details', margin, yPosition)
-  yPosition += 8
+  checkPageBreak(50)
+  addSectionHeader('Transaction Details')
 
   // Table headers with background
-  doc.setFillColor(240, 242, 248) // Light blue background
+  doc.setFillColor(...headerBgColor)
   doc.setDrawColor(...primaryColor)
   doc.rect(margin, yPosition - 5, pageWidth - margin * 2, lineHeight + 2, 'F')
 
@@ -557,9 +645,9 @@ export const generateEnhancedTransactionPDF = (transactions, summary, filterInfo
   doc.setTextColor(...primaryColor)
 
   const colDate = margin + 2
-  const colTitle = margin + 35
-  const colType = margin + 95
-  const colAmount = pageWidth - margin - 30
+  const colTitle = margin + 28
+  const colType = margin + 75
+  const colAmount = pageWidth - margin - 28
 
   doc.text('Date', colDate, yPosition)
   doc.text('Description', colTitle, yPosition)
@@ -570,15 +658,15 @@ export const generateEnhancedTransactionPDF = (transactions, summary, filterInfo
   // Table data
   doc.setFont(undefined, 'normal')
   doc.setFontSize(9)
-  doc.setTextColor(...textDarkColor)
 
-  transactions.forEach((transaction) => {
+  transactions.forEach((transaction, index) => {
+    // Check if we need a new page
     if (yPosition > pageHeight - 15) {
       doc.addPage()
       yPosition = margin
 
-      // Repeat headers
-      doc.setFillColor(240, 242, 248)
+      // Repeat headers on new page
+      doc.setFillColor(...headerBgColor)
       doc.setDrawColor(...primaryColor)
       doc.rect(margin, yPosition - 5, pageWidth - margin * 2, lineHeight + 2, 'F')
       doc.setFont(undefined, 'bold')
@@ -589,39 +677,74 @@ export const generateEnhancedTransactionPDF = (transactions, summary, filterInfo
       doc.text('Amount', colAmount, yPosition)
       yPosition += lineHeight + 4
       doc.setFont(undefined, 'normal')
-      doc.setTextColor(...textDarkColor)
     }
 
     const date = formatDate(transaction.dateISO)
     const type = transaction.type.charAt(0).toUpperCase() + transaction.type.slice(1)
-    const amount = `$${transaction.amount.toFixed(2)}`
+    
+    // Format amount with sign and color based on type
+    let amount
+    let amountColor
+    if (transaction.type === 'income') {
+      amount = `+$${transaction.amount.toFixed(2)}`
+      amountColor = incomeColor
+    } else {
+      amount = `-$${transaction.amount.toFixed(2)}`
+      amountColor = expenseColor
+    }
 
-    // Alternate row color
-    if (Math.floor((transactions.indexOf(transaction) % 2)) === 0) {
+    // Alternate row color for readability
+    if (index % 2 === 0) {
       doc.setFillColor(248, 249, 250)
       doc.rect(margin, yPosition - 5, pageWidth - margin * 2, lineHeight + 1, 'F')
     }
 
-    const wrappedTitle = doc.splitTextToSize(transaction.description, 55)
+    // Set text color - dark for most, colored for amount
+    doc.setTextColor(...textDarkColor)
+
+    // Wrap description to fit column
+    const maxDescWidth = 45
+    const wrappedTitle = doc.splitTextToSize(transaction.description, maxDescWidth)
+    const rowHeight = lineHeight * Math.max(wrappedTitle.length, 1) + 1
 
     doc.text(date, colDate, yPosition)
     doc.text(wrappedTitle, colTitle, yPosition)
     doc.text(type, colType, yPosition)
+    
+    // Amount in appropriate color
+    doc.setTextColor(...amountColor)
+    doc.setFont(undefined, 'bold')
     doc.text(amount, colAmount, yPosition)
+    doc.setFont(undefined, 'normal')
+    doc.setTextColor(...textDarkColor)
 
-    yPosition += lineHeight * Math.max(wrappedTitle.length, 1) + 1
+    yPosition += rowHeight
   })
 
-  // Footer
-  yPosition = pageHeight - 10
-  doc.setFontSize(8)
-  doc.setTextColor(150)
-  doc.text(`Page ${doc.internal.pages.length - 1} of ${doc.internal.pages.length - 1}`, margin, yPosition)
-  const footerText = 'MoneyFlow Financial Report'
-  doc.text(footerText, pageWidth - margin - doc.getTextWidth(footerText), yPosition)
+  // ===== FOOTER =====
+  // Add footer to every page
+  const totalPages = doc.internal.pages.length - 1
+  for (let i = 1; i <= totalPages; i++) {
+    doc.setPage(i)
+    const footerY = pageHeight - 10
+    
+    doc.setFontSize(8)
+    doc.setTextColor(150)
+    doc.text(`Page ${i} of ${totalPages}`, margin, footerY)
+    
+    const footerText = 'MoneyFlow Financial Report'
+    const footerX = pageWidth - margin - doc.getTextWidth(footerText)
+    doc.text(footerText, footerX, footerY)
+  }
 
   return doc
 }
+
+/**
+ * Download enhanced PDF with charts
+ * @param {Transaction[]} transactions - Array of transactions
+ * @param {Object} summary - Summary data
+ * @param {string} filename - Filename for download
 
 /**
  * Download enhanced PDF with charts
