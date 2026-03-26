@@ -14,9 +14,12 @@ import { captureChartsAsImages } from '../utils/chartExport'
 function ReportsPage({ budgetState }) {
   const [filters, setFilters] = useState(getDefaultFilters())
   const [isExporting, setIsExporting] = useState(false)
+  const [exportStatus, setExportStatus] = useState(null) // 'csv', 'pdf', or null
+  const [exportMessage, setExportMessage] = useState('')
   const chartsContainerRef = useRef(null)
   const pdfExportContainerRef = useRef(null)
   const transactions = budgetState.transactions
+  const exportTimeoutRef = useRef(null)
 
   // Apply filters and get filtered transactions
   const filteredTransactions = getSortedTransactions(applyFilters(transactions, filters))
@@ -60,22 +63,72 @@ function ReportsPage({ budgetState }) {
     return 'All Transactions'
   }
 
-  const handleExportCSV = () => {
-    if (filteredTransactions.length === 0) {
-      alert('No transactions to export')
-      return
-    }
-    downloadTransactionCSV(filteredTransactions, `${generateFileName()}.csv`)
+  // Generate export message with filter context
+  const getExportMessage = () => {
+    const filterLabel = generateFilterInfo()
+    return `Exported ${transactionCount} transaction${transactionCount !== 1 ? 's' : ''} for: ${filterLabel}`
   }
 
-  const handleExportPDF = async () => {
+  const handleExportCSV = () => {
     if (filteredTransactions.length === 0) {
-      alert('No transactions to export')
+      setExportMessage('No transactions to export')
+      setExportStatus('error')
+      if (exportTimeoutRef.current) clearTimeout(exportTimeoutRef.current)
+      exportTimeoutRef.current = setTimeout(() => {
+        setExportStatus(null)
+        setExportMessage('')
+      }, 3000)
       return
     }
     
     setIsExporting(true)
+    setExportStatus('csv')
+    setExportMessage('Preparing CSV download…')
+
+    // Simulate processing time for better UX feedback
+    setTimeout(() => {
+      try {
+        downloadTransactionCSV(filteredTransactions, `${generateFileName()}.csv`)
+        setExportMessage(getExportMessage())
+        
+        // Auto-clear success message after 3 seconds
+        if (exportTimeoutRef.current) clearTimeout(exportTimeoutRef.current)
+        exportTimeoutRef.current = setTimeout(() => {
+          setExportStatus(null)
+          setExportMessage('')
+          setIsExporting(false)
+        }, 3000)
+      } catch (error) {
+        console.error('Error exporting CSV:', error)
+        setExportMessage('Error exporting CSV. Please try again.')
+        setExportStatus('error')
+        setIsExporting(false)
+        
+        if (exportTimeoutRef.current) clearTimeout(exportTimeoutRef.current)
+        exportTimeoutRef.current = setTimeout(() => {
+          setExportStatus(null)
+          setExportMessage('')
+        }, 3000)
+      }
+    }, 300)
+  }
+
+  const handleExportPDF = async () => {
+    if (filteredTransactions.length === 0) {
+      setExportMessage('No transactions to export')
+      setExportStatus('error')
+      if (exportTimeoutRef.current) clearTimeout(exportTimeoutRef.current)
+      exportTimeoutRef.current = setTimeout(() => {
+        setExportStatus(null)
+        setExportMessage('')
+      }, 3000)
+      return
+    }
     
+    setIsExporting(true)
+    setExportStatus('pdf')
+    setExportMessage('Generating PDF report…')
+
     try {
       const summaryData = {
         totalIncome,
@@ -120,11 +173,27 @@ function ReportsPage({ budgetState }) {
       }
       
       downloadEnhancedTransactionPDF(filteredTransactions, summaryData, `${generateFileName()}.pdf`, generateFilterInfo(), chartImages)
+      
+      setExportMessage(getExportMessage())
+      
+      // Auto-clear success message after 3 seconds
+      if (exportTimeoutRef.current) clearTimeout(exportTimeoutRef.current)
+      exportTimeoutRef.current = setTimeout(() => {
+        setExportStatus(null)
+        setExportMessage('')
+        setIsExporting(false)
+      }, 3000)
     } catch (error) {
       console.error('Error during PDF export:', error)
-      alert('An error occurred during PDF export. Please try again.')
-    } finally {
+      setExportMessage('Error generating PDF. Please try again.')
+      setExportStatus('error')
       setIsExporting(false)
+      
+      if (exportTimeoutRef.current) clearTimeout(exportTimeoutRef.current)
+      exportTimeoutRef.current = setTimeout(() => {
+        setExportStatus(null)
+        setExportMessage('')
+      }, 3000)
     }
   }
 
@@ -154,23 +223,63 @@ function ReportsPage({ budgetState }) {
               )}
             </div>
             {filteredTransactions.length > 0 && (
-              <div className="export-buttons">
-                <button 
-                  className="export-button" 
-                  onClick={handleExportCSV}
-                  disabled={isExporting}
-                  title="Export filtered transactions as CSV"
-                >
-                  ↓ CSV
-                </button>
-                <button 
-                  className="export-button" 
-                  onClick={handleExportPDF}
-                  disabled={isExporting}
-                  title="Export filtered transactions as PDF"
-                >
-                  {isExporting ? '⏳ Generating...' : '↓ PDF'}
-                </button>
+              <div className="export-section">
+                <div className="export-buttons">
+                  <div className="export-button-group">
+                    <button 
+                      className="export-button csv-button" 
+                      onClick={handleExportCSV}
+                      disabled={isExporting}
+                      title="Download transaction data in CSV format (spreadsheet compatible)"
+                    >
+                      <span className="export-icon">⬇</span>
+                      <span className="export-label">Download CSV</span>
+                    </button>
+                    <p className="export-helper">Raw transaction data for spreadsheets</p>
+                  </div>
+
+                  <div className="export-button-group">
+                    <button 
+                      className="export-button pdf-button" 
+                      onClick={handleExportPDF}
+                      disabled={isExporting}
+                      title="Download professional PDF report with summary and charts"
+                    >
+                      <span className="export-icon">⬇</span>
+                      <span className="export-label">Download PDF</span>
+                    </button>
+                    <p className="export-helper">Professional report with summary & charts</p>
+                  </div>
+                </div>
+
+                {/* Export Status Message */}
+                {exportMessage && (
+                  <div className={`export-status export-status-${exportStatus}`}>
+                    {exportStatus === 'csv' || exportStatus === 'pdf' ? (
+                      <>
+                        <span className="status-spinner">⟳</span>
+                        <span className="status-text">{exportMessage}</span>
+                      </>
+                    ) : exportStatus === 'error' ? (
+                      <>
+                        <span className="status-icon">⚠</span>
+                        <span className="status-text">{exportMessage}</span>
+                      </>
+                    ) : (
+                      <>
+                        <span className="status-icon">✓</span>
+                        <span className="status-text">{exportMessage}</span>
+                      </>
+                    )}
+                  </div>
+                )}
+
+                {/* Filter context message */}
+                {filters.type !== 'all' && (
+                  <p className="export-note">
+                    💾 Exports will include the current filters
+                  </p>
+                )}
               </div>
             )}
           </div>
