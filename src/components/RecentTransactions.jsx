@@ -42,7 +42,7 @@ function RecentTransactions({ transactions, onDeleteTransaction, onUpdateTransac
       <section className="recent-transactions-section">
         <h2>Recent Activity</h2>
         <div className="empty-state">
-          <p>No transactions yet. Add income or expenses to get started!</p>
+          <p>No activity yet</p>
         </div>
       </section>
     )

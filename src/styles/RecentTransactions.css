@@ -213,12 +213,13 @@
 .empty-state {
   text-align: center;
   padding: 2rem 1rem;
-  color: var(--text-secondary);
+  color: #999;
 }
 
 .empty-state p {
   margin: 0;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
+  font-weight: 400;
 }
 
 /* Responsive design */

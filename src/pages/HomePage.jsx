@@ -4,6 +4,8 @@ import RecentTransactions from '../components/RecentTransactions'
 import '../styles/HomePage.css'
 
 function HomePage({ budgetState }) {
+  const hasTransactions = budgetState.transactions && budgetState.transactions.length > 0
+  
   return (
     <main className="main-content">
       <div className="page-header">
@@ -13,13 +15,21 @@ function HomePage({ budgetState }) {
         </p>
       </div>
 
+      {/* Empty State Instruction */}
+      {!hasTransactions && (
+        <div className="empty-state-hint">
+          <p>💡 Start by adding your first income or expense</p>
+        </div>
+      )}
+
       <div className="layout-container">
         {/* Left Column: Transaction Input */}
-        <section className="section-column input-column">
-          <div className="section-wrapper">
+        <section className={`section-column input-column ${!hasTransactions ? 'emphasized' : ''}`}>
+          <div className={`section-wrapper ${!hasTransactions ? 'form-emphasized' : ''}`}>
             <TransactionForm 
               onAddIncome={budgetState.addIncome}
               onAddExpense={budgetState.addExpense}
+              isEmpty={!hasTransactions}
             />
           </div>
         </section>
@@ -31,21 +41,24 @@ function HomePage({ budgetState }) {
               income={budgetState.totalIncome}
               totalExpenses={budgetState.totalExpenses}
               remainingBudget={budgetState.remainingBudget}
+              isEmpty={!hasTransactions}
             />
           </div>
         </section>
       </div>
 
       {/* Full Width: Recent Activity */}
-      <div className="recent-activity-container">
-        <div className="section-wrapper">
-          <RecentTransactions
-            transactions={budgetState.transactions}
-            onDeleteTransaction={budgetState.deleteTransaction}
-            onUpdateTransaction={budgetState.updateTransaction}
-          />
+      {hasTransactions && (
+        <div className="recent-activity-container">
+          <div className="section-wrapper">
+            <RecentTransactions
+              transactions={budgetState.transactions}
+              onDeleteTransaction={budgetState.deleteTransaction}
+              onUpdateTransaction={budgetState.updateTransaction}
+            />
+          </div>
         </div>
-      </div>
+      )}
     </main>
   )
 }

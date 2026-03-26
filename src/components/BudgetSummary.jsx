@@ -1,7 +1,7 @@
 import '../styles/BudgetSummary.css'
 import { calculateBudgetPercentage, isOverBudget, getOverBudgetAmount } from '../utils/budgetCalculations'
 
-function BudgetSummary({ income, totalExpenses, remainingBudget }) {
+function BudgetSummary({ income, totalExpenses, remainingBudget, isEmpty = false }) {
   const percentage = calculateBudgetPercentage(totalExpenses, income)
   const overBudget = isOverBudget(remainingBudget)
   const overAmount = getOverBudgetAmount(remainingBudget)
@@ -18,7 +18,7 @@ function BudgetSummary({ income, totalExpenses, remainingBudget }) {
   }
 
   return (
-    <section className="budget-summary-section">
+    <section className={`budget-summary-section ${isEmpty ? 'empty-state' : ''}`}>
       <h2>Budget Summary</h2>
       
       <div className="summary-grid">
@@ -39,6 +39,12 @@ function BudgetSummary({ income, totalExpenses, remainingBudget }) {
           </p>
         </div>
       </div>
+
+      {isEmpty && (
+        <div className="empty-state-message">
+          <p>Your summary will update once you add transactions</p>
+        </div>
+      )}
 
       {/* Progress Bar */}
       <div className="budget-visualization">

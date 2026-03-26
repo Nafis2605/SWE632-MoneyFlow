@@ -4,6 +4,13 @@
   padding: 1.5rem;
   box-shadow: var(--shadow-md);
   border: 1px solid var(--color-border);
+  transition: all 0.2s ease;
+}
+
+.transaction-form-section.empty-state-form {
+  background: linear-gradient(135deg, rgba(249, 65, 68, 0.03) 0%, rgba(83, 103, 171, 0.03) 100%);
+  border: 2px solid rgba(249, 65, 68, 0.2);
+  box-shadow: 0 0 0 4px rgba(249, 65, 68, 0.08), var(--shadow-md);
 }
 
 .transaction-form-header {
@@ -14,6 +21,35 @@
   font-size: 1.5rem;
   margin: 0 0 1rem 0;
   color: var(--color-dark);
+}
+
+/* Form Hint - Subtle Step Instructions */
+.form-hint {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  background-color: rgba(251, 146, 60, 0.08);
+  border-radius: calc(var(--border-radius) - 2px);
+  font-size: 0.85rem;
+  color: #666;
+  line-height: 1.4;
+  flex-wrap: wrap;
+  margin-top: 0.5rem;
+}
+
+.form-hint span {
+  font-weight: 500;
+}
+
+.form-hint span:nth-child(odd) {
+  color: #666;
+}
+
+.form-hint span:nth-child(even) {
+  color: #ccc;
+  margin: 0 0.25rem;
 }
 
 /* Toggle Buttons */
@@ -64,10 +100,16 @@
 /* Form Group */
 .transaction-form .form-group {
   margin-bottom: 1rem;
+  position: relative;
 }
 
 .transaction-form .form-group:last-of-type {
   margin-bottom: 1.5rem;
+}
+
+.transaction-form .form-group.has-error .form-input {
+  border-color: var(--color-error);
+  background-color: rgba(220, 38, 38, 0.02);
 }
 
 .transaction-form label {
@@ -90,15 +132,53 @@
   border: 1px solid var(--color-border);
   border-radius: calc(var(--border-radius) - 2px);
   font-size: 1rem;
-  transition: border-color 0.2s ease;
+  transition: border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
   background: var(--color-light);
   color: var(--color-dark);
+}
+
+.transaction-form .form-input.input-invalid {
+  border-color: #dc2626;
+  border-width: 1.5px;
 }
 
 .transaction-form .form-input:focus {
   outline: none;
   border-color: var(--color-primary);
   box-shadow: 0 0 0 3px rgba(83, 103, 171, 0.1);
+}
+
+.transaction-form .form-input.input-invalid:focus {
+  border-color: #dc2626;
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+}
+
+/* Field-level error message */
+.field-error-message {
+  color: var(--color-error);
+  font-size: 0.8rem;
+  font-weight: 500;
+  margin: 0.35rem 0 0 0;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.field-error-message::before {
+  content: '⚠';
+  font-size: 0.75rem;
+}
+
+/* Form incomplete message - appears when button is disabled */
+.form-incomplete-message {
+  color: #666;
+  font-size: 0.85rem;
+  margin: 0.5rem 0 1rem 0;
+  padding: 0.5rem 0.75rem;
+  background-color: rgba(107, 114, 128, 0.08);
+  border-left: 2px solid #9ca3af;
+  border-radius: calc(var(--border-radius) - 3px);
+  font-weight: 500;
 }
 
 /* Select/Dropdown Styling */
@@ -182,9 +262,11 @@
 }
 
 .transaction-form .btn-primary:disabled {
-  opacity: 0.5;
+  opacity: 0.6;
   cursor: not-allowed;
   transform: none;
+  background: linear-gradient(135deg, #cbd5e0, #a0aec0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .transaction-form .btn:focus-visible {
@@ -212,6 +294,11 @@
     min-width: auto;
     padding: 0.5rem 1rem;
   }
+
+  .form-hint {
+    font-size: 0.8rem;
+    padding: 0.6rem;
+  }
 }
 
 @media (max-width: 480px) {
@@ -230,5 +317,16 @@
 
   .transaction-form .form-input {
     font-size: 16px; /* Prevents zoom on iOS */
+  }
+
+  .form-hint {
+    flex-direction: column;
+    gap: 0.25rem;
+    align-items: flex-start;
+    font-size: 0.75rem;
+  }
+
+  .form-hint span:nth-child(even) {
+    display: none;
   }
 }
