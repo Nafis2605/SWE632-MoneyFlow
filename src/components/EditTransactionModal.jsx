@@ -1,89 +1,88 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { getTodayISO } from '../utils/date'
 import { getCategoryOptions } from '../utils/categories'
 import ConfirmModal from './ConfirmModal'
 import '../styles/EditTransactionModal.css'
 
 function EditTransactionModal({ isOpen, transaction, onClose, onSave }) {
+  // Form state is kept separate from the transaction prop to prevent mutation
   const [description, setDescription] = useState('')
   const [category, setCategory] = useState('')
-  const [amount, setAmount] = useState('')
+  const [amount, setAmount] = useState('')   // always stored as a string
   const [date, setDate] = useState(getTodayISO())
   const [error, setError] = useState(null)
   const [showConfirm, setShowConfirm] = useState(false)
 
+  // Ref tracks which transaction ID the form was last initialized for,
+  // preventing re-initialization (and the render loop) for the same transaction
+  const initializedForIdRef = useRef(null)
+
   useEffect(() => {
-    if (isOpen && transaction) {
-      // Defensive checks for all transaction properties
-      const validDescription = typeof transaction.description === 'string' ? transaction.description : ''
-      const validCategory = typeof transaction.category === 'string' ? transaction.category : ''
-      const validAmount = typeof transaction.amount === 'number' && transaction.amount > 0 ? transaction.amount : ''
-      const validDate = typeof transaction.dateISO === 'string' && transaction.dateISO.length > 0 ? transaction.dateISO : getTodayISO()
-      
-      setDescription(validDescription)
-      setCategory(validCategory)
-      setAmount(validAmount)
-      setDate(validDate)
-      setError(null)
-    }
-  }, [transaction, isOpen])
+    if (!isOpen || !transaction) return
 
-  // Early return with null check - prevents rendering if modal not open OR transaction missing
-  if (!isOpen || !transaction) {
-    return null
-  }
+    // Skip if this transaction is already loaded in the form
+    if (initializedForIdRef.current === transaction.id) return
 
-  // Validate transaction object has required properties
-  if (typeof transaction.id !== 'string' || transaction.id.length === 0) {
-    return null
-  }
+    console.log('[EditModal] Initializing form for transaction:', transaction.id)
+    initializedForIdRef.current = transaction.id
 
-  const type = (transaction.type === 'income' || transaction.type === 'expense') ? transaction.type : 'expense'
-  const categoryOptions = Array.isArray(getCategoryOptions(type)) ? getCategoryOptions(type) : []
+    setDescription(typeof transaction.description === 'string' ? transaction.description : '')
+    setCategory(typeof transaction.category === 'string' ? transaction.category : '')
+    // Convert amount to string — calling .trim() on a number crashes the render
+    setAmount(
+      typeof transaction.amount === 'number' && transaction.amount > 0
+        ? String(transaction.amount)
+        : ''
+    )
+    setDate(
+      typeof transaction.dateISO === 'string' && transaction.dateISO
+        ? transaction.dateISO
+        : getTodayISO()
+    )
+    setError(null)
+    setShowConfirm(false)
+  }, [isOpen, transaction?.id]) // depend on ID only, not the full object reference
 
-  const isDisabled =
-    !description.trim() ||
-    !category ||
-    !amount.trim() ||
-    isNaN(parseFloat(amount)) ||
-    parseFloat(amount) <= 0 ||
-    !date
+  // Guard: render nothing when modal is closed or no transaction is selected
+  if (!isOpen || !transaction) return null
+  if (typeof transaction.id !== 'string' || !transaction.id) return null
 
-  // Check if any fields have changed - with defensive comparisons
-  const transactionAmount = typeof transaction.amount === 'number' ? transaction.amount : 0
-  const parsedCurrentAmount = amount ? parseFloat(amount) : 0
-  
+  const type = transaction.type === 'income' ? 'income' : 'expense'
+  const categoryOptions = getCategoryOptions(type) ?? []
+
+  // amount is always a string here, so .trim() is safe
+  const parsedAmount = parseFloat(amount)
+  const isFormValid =
+    description.trim().length > 0 &&
+    category.length > 0 &&
+    amount.trim().length > 0 &&
+    !isNaN(parsedAmount) &&
+    parsedAmount > 0 &&
+    date.length > 0
+
   const hasChanges =
-    (description || '') !== (transaction.description || '') ||
-    (category || '') !== (transaction.category || '') ||
-    parsedCurrentAmount !== transactionAmount ||
-    (date || '') !== (transaction.dateISO || '')
+    description !== (transaction.description ?? '') ||
+    category !== (transaction.category ?? '') ||
+    parsedAmount !== (transaction.amount ?? 0) ||
+    date !== (transaction.dateISO ?? '')
 
   const handleSubmit = (e) => {
     e.preventDefault()
     setError(null)
 
-    // Validate description
-    if (typeof description !== 'string' || !description.trim()) {
-      setError(`${type === 'income' ? 'Income' : 'Expense'} description is required`)
+    if (!description.trim()) {
+      setError('Description is required')
       return
     }
-    
-    // Validate category
-    if (typeof category !== 'string' || !category) {
+    if (!category) {
       setError('Category is required')
       return
     }
-    
-    // Validate amount
-    const parsedAmount = parseFloat(amount)
-    if (typeof amount !== 'string' || !amount.trim() || isNaN(parsedAmount) || parsedAmount <= 0) {
+    if (isNaN(parsedAmount) || parsedAmount <= 0) {
       setError('Amount must be greater than 0')
       return
     }
-    
-    // Validate date
-    if (typeof date !== 'string' || !date) {
+    if (!date) {
       setError('Date is required')
       return
     }
@@ -92,74 +91,38 @@ function EditTransactionModal({ isOpen, transaction, onClose, onSave }) {
   }
 
   const handleConfirmUpdate = () => {
-    try {
-      // Validate callback exists and is callable
-      if (typeof onSave !== 'function') {
-        setShowConfirm(false)
-        setError('Save handler not available')
-        return
-      }
+    setShowConfirm(false)
 
-      // Validate transaction ID is valid
-      if (typeof transaction.id !== 'string' || transaction.id.length === 0) {
-        setShowConfirm(false)
-        setError('Invalid transaction ID')
-        return
-      }
-
-      // Parse and validate amount
-      const parsedAmount = parseFloat(amount)
-      if (isNaN(parsedAmount) || parsedAmount <= 0) {
-        setError('Invalid amount value')
-        return
-      }
-
-      // Call save handler
-      const result = onSave(transaction.id, description.trim(), category, parsedAmount, date)
-      
-      // Handle result
-      if (result && typeof result === 'object') {
-        if (result.success === true) {
-          handleClose()
-        } else if (Array.isArray(result.errors) && result.errors.length > 0) {
-          setError(String(result.errors[0]))
-        } else {
-          setError('Failed to update transaction')
-        }
-      } else {
-        // No result or falsy result means success
-        handleClose()
-      }
-    } catch (err) {
-      setShowConfirm(false)
-      setError(`Error updating transaction: ${err instanceof Error ? err.message : 'Unknown error'}`)
-    } finally {
-      setShowConfirm(false)
+    if (typeof onSave !== 'function') {
+      setError('Save handler not available')
+      return
     }
+
+    const result = onSave(transaction.id, description.trim(), category, parsedAmount, date)
+
+    if (result && typeof result === 'object' && !result.success) {
+      const msg =
+        Array.isArray(result.errors) && result.errors.length > 0
+          ? String(result.errors[0])
+          : 'Failed to update transaction'
+      setError(msg)
+      return
+    }
+
+    console.log('[EditModal] Transaction updated successfully:', transaction.id)
+    handleClose()
   }
 
   const handleClose = () => {
-    // Reset form to original transaction values with defensive checks
-    const validDescription = typeof transaction.description === 'string' ? transaction.description : ''
-    const validCategory = typeof transaction.category === 'string' ? transaction.category : ''
-    const validAmount = typeof transaction.amount === 'number' ? transaction.amount : ''
-    const validDate = typeof transaction.dateISO === 'string' ? transaction.dateISO : getTodayISO()
-    
-    setDescription(validDescription)
-    setCategory(validCategory)
-    setAmount(validAmount)
-    setDate(validDate)
+    // Clear the init-guard so the form re-initializes next time this transaction is opened
+    initializedForIdRef.current = null
+    setDescription('')
+    setCategory('')
+    setAmount('')
+    setDate(getTodayISO())
     setError(null)
     setShowConfirm(false)
-    
-    // Call callback if available
-    if (typeof onClose === 'function') {
-      try {
-        onClose()
-      } catch (err) {
-        console.error('Error in onClose callback:', err)
-      }
-    }
+    if (typeof onClose === 'function') onClose()
   }
 
   return (
@@ -193,7 +156,7 @@ function EditTransactionModal({ isOpen, transaction, onClose, onSave }) {
                   type="text"
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  placeholder={`e.g., ${type === 'income' ? 'Salary, Freelance work' : 'Grocery shopping, Rent payment'}`}
+                  placeholder={type === 'income' ? 'e.g., Salary, Freelance work' : 'e.g., Grocery shopping, Rent'}
                   className="form-input"
                 />
               </div>
@@ -221,7 +184,7 @@ function EditTransactionModal({ isOpen, transaction, onClose, onSave }) {
                   id="edit-amount"
                   type="number"
                   step="0.01"
-                  min="0"
+                  min="0.01"
                   value={amount}
                   onChange={(e) => setAmount(e.target.value)}
                   placeholder="0.00"
@@ -252,7 +215,7 @@ function EditTransactionModal({ isOpen, transaction, onClose, onSave }) {
               <button
                 type="submit"
                 className="edit-modal-btn edit-modal-btn-save"
-                disabled={isDisabled || !hasChanges}
+                disabled={!isFormValid || !hasChanges}
               >
                 Update
               </button>

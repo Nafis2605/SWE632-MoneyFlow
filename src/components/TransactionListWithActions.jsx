@@ -10,7 +10,6 @@ import {
   createCancelDeleteHandler,
   createEditClickHandler,
   createCloseEditModalHandler,
-  createSaveEditHandler
 } from '../utils/transactionActions'
 
 /**

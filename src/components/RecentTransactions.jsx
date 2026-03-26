@@ -11,7 +11,6 @@ import {
   createCancelDeleteHandler,
   createEditClickHandler,
   createCloseEditModalHandler,
-  createSaveEditHandler
 } from '../utils/transactionActions'
 
 function RecentTransactions({ transactions, onDeleteTransaction, onUpdateTransaction }) {
@@ -19,10 +18,9 @@ function RecentTransactions({ transactions, onDeleteTransaction, onUpdateTransac
   const [editModal, setEditModal] = useState({ isOpen: false, transaction: null })
   const recentTxns = getRecentTransactions(transactions, 5)
 
-  // Use shared handlers from transactionActions utility
   const handleDeleteClick = createDeleteClickHandler(setDeleteModal)
   const handleEditClick = createEditClickHandler(setEditModal)
-  
+
   const handleConfirmDelete = () => {
     const handler = createConfirmDeleteHandler(setDeleteModal, onDeleteTransaction)
     handler(deleteModal.transactionId)
@@ -31,7 +29,7 @@ function RecentTransactions({ transactions, onDeleteTransaction, onUpdateTransac
   const handleCancelDelete = createCancelDeleteHandler(setDeleteModal)
   const handleCloseEditModal = createCloseEditModalHandler(setEditModal)
   const handleSaveEdit = (id, description, category, amount, date) => {
-    if (onUpdateTransaction) {
+    if (typeof onUpdateTransaction === 'function') {
       return onUpdateTransaction(id, description, category, amount, date)
     }
     return { success: false }

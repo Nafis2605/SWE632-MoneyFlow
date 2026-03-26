@@ -80,12 +80,12 @@ export const useBudgetState = () => {
     setTransactions(prevTransactions =>
       prevTransactions.map(transaction =>
         transaction.id === id
-          ? { 
-              ...transaction, 
-              description: description.trim(), 
+          ? {
+              ...transaction,
+              description: description.trim(),
               category: category || transaction.category,
               amount: Math.max(0, parseFloat(amount)),
-              dateISO: dateISO || transaction.dateISO
+              dateISO: dateISO || transaction.dateISO,
             }
           : transaction
       )
