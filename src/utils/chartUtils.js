@@ -18,28 +18,67 @@ export const TRANSACTION_COLORS = {
 }
 
 /**
- * Color palette for expense category charts
- * Used for pie charts showing expense category breakdown
- */
-export const CHART_COLORS = [
-  '#5367AB', '#dc2626', '#16a34a', '#ff6b6b',
-  '#4ecdc4', '#45b7d1', '#f7b731', '#5f27cd',
-  '#a29bfe', '#74b9ff', '#81ecec', '#fab1a0'
-]
-
-/**
- * Transform expenses for pie chart - grouped by category
+ * Transform expenses for pie chart - grouped by category with smart "Other" aggregation
+ * Shows all categories above 2% threshold, groups smaller ones into "Other"
  * @param {Array} expenses - Array of expense objects (transactions)
  * @returns {Array} Data formatted for pie chart, aggregated by category
  */
 export const preparePieChartData = (expenses) => {
   const aggregated = groupExpensesByCategory(expenses)
   
-  return aggregated.map((item) => ({
+  // Calculate total for percentage calculation
+  const total = aggregated.reduce((sum, item) => sum + item.amount, 0)
+  if (total === 0) return []
+  
+  // Threshold for grouping into "Other" (2%)
+  const thresholdPercent = 2
+  const thresholdAmount = (total * thresholdPercent) / 100
+  
+  // Separate categories into significant (>= 2%) and small (< 2%)
+  const significantCategories = []
+  const smallCategories = []
+  
+  aggregated.forEach(item => {
+    const percentage = (item.amount / total) * 100
+    if (percentage >= thresholdPercent) {
+      significantCategories.push(item)
+    } else {
+      smallCategories.push(item)
+    }
+  })
+  
+  // Transform significant categories
+  const result = significantCategories.map((item) => ({
     name: item.label,
     value: item.amount,
-    color: getCategoryColor(item.label)
+    color: getCategoryColor(item.category, 'expense'),
+    category: item.category,
+    percentage: ((item.amount / total) * 100).toFixed(1),
+    count: item.count
   }))
+  
+  // Group small categories into "Other"
+  const otherTotal = smallCategories.reduce((sum, item) => sum + item.amount, 0)
+  if (otherTotal > 0) {
+    // Create breakdown for "Other" tooltip
+    const otherBreakdown = smallCategories.map(item => ({
+      label: item.label,
+      amount: item.amount,
+      percentage: ((item.amount / total) * 100).toFixed(1)
+    }))
+    
+    result.push({
+      name: 'Other',
+      value: otherTotal,
+      color: '#9ca3af', // Neutral gray for "Other"
+      category: 'other',
+      percentage: ((otherTotal / total) * 100).toFixed(1),
+      breakdown: otherBreakdown,
+      isOther: true
+    })
+  }
+  
+  return result
 }
 
 /**
@@ -60,7 +99,7 @@ export const prepareBarChartData = (expenses) => {
       amount: item.amount,
       fullName: item.label,
       count: item.count,
-      color: getCategoryColor(item.label)
+      color: getCategoryColor(item.category, 'expense')
     }))
 }
 

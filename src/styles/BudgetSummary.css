@@ -5,28 +5,22 @@
 .budget-summary-section h2 {
   font-size: 1.5rem;
   color: var(--color-dark);
-  margin-bottom: var(--spacing-lg);
+  margin-bottom: var(--spacing-md);
   font-weight: 600;
 }
 
-/* Empty State Styling */
-.budget-summary-section.empty-state .summary-card {
-  opacity: 0.7;
-  background: linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%);
-  border-color: #f0f0f0;
-}
-
-.empty-state-message {
-  padding: var(--spacing-md);
-  background-color: rgba(251, 146, 60, 0.08);
-  border-left: 3px solid #fb923c;
+/* Helper text for empty state - subtle and non-intrusive */
+.helper-text {
+  padding: var(--spacing-md) var(--spacing-lg);
+  background-color: rgba(59, 130, 246, 0.05);
+  border-left: 3px solid rgba(59, 130, 246, 0.3);
   border-radius: calc(var(--border-radius) - 2px);
-  margin: var(--spacing-md) 0;
+  margin-bottom: var(--spacing-md);
 }
 
-.empty-state-message p {
+.helper-text p {
   font-size: 0.9rem;
-  color: #666;
+  color: #555;
   margin: 0;
   font-weight: 500;
 }
@@ -160,7 +154,7 @@
     font-size: 1rem;
   }
 
-  .empty-state-message {
+  .helper-text {
     padding: var(--spacing-md);
     font-size: 0.85rem;
   }

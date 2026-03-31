@@ -19,23 +19,91 @@ function ExpenseVisualization({ expenses }) {
     )
   }
 
+  // Custom label renderer for pie chart - shows percentages
+  const renderCustomLabel = (entry) => {
+    // Only show label if percentage >= 4% for readability
+    const percentage = parseFloat(entry.percentage)
+    if (percentage >= 4) {
+      return `${entry.percentage}%`
+    }
+    return null
+  }
+
+  // Custom tooltip for pie chart with smart "Other" breakdown
+  const PieTooltip = ({ active, payload }) => {
+    if (active && payload && payload.length) {
+      const data = payload[0].payload
+      
+      // If this is the "Other" category, show breakdown
+      if (data.isOther && data.breakdown) {
+        return (
+          <div className="pie-chart-tooltip other-breakdown">
+            <p className="tooltip-title">Other Categories</p>
+            <div className="breakdown-list">
+              {data.breakdown.map((item, idx) => (
+                <div key={idx} className="breakdown-item">
+                  <span className="breakdown-label">{item.label}</span>
+                  <span className="breakdown-amount">${item.amount.toFixed(2)}</span>
+                  <span className="breakdown-percentage">({item.percentage}%)</span>
+                </div>
+              ))}
+            </div>
+            <div className="breakdown-total">
+              <span className="total-label">Total Other:</span>
+              <span className="total-amount">${data.value.toFixed(2)}</span>
+              <span className="total-percentage">({data.percentage}%)</span>
+            </div>
+          </div>
+        )
+      }
+      
+      // Regular tooltip for standard categories
+      return (
+        <div className="pie-chart-tooltip">
+          <p className="tooltip-category">{data.name}</p>
+          <p className="tooltip-amount">Amount: ${data.value.toFixed(2)}</p>
+          <p className="tooltip-percentage">Percentage: {data.percentage}%</p>
+        </div>
+      )
+    }
+    return null
+  }
+
+  // Custom tooltip for bar chart
+  const BarTooltip = ({ active, payload }) => {
+    if (active && payload && payload.length) {
+      const data = payload[0].payload
+      return (
+        <div className="bar-chart-tooltip">
+          <p className="tooltip-category">{data.fullName}</p>
+          <p className="tooltip-amount">Amount: ${data.amount.toFixed(2)}</p>
+          <p className="tooltip-count">Transactions: {data.count}</p>
+        </div>
+      )
+    }
+    return null
+  }
+
   return (
     <section className="expense-visualization-section">
       <h2>Expense Distribution</h2>
 
       {/* Charts Container */}
       <div className="charts-container">
-        {/* Pie Chart */}
+        {/* Pie Chart - Refined */}
         <div className="chart-wrapper pie-chart-wrapper">
           <h3>Expense Breakdown</h3>
+          <p className="chart-description">
+            Categories shown if ≥2% of total. Hover for detailed information.
+          </p>
           <ResponsiveContainer width="100%" height={350}>
-            <PieChart>
+            <PieChart margin={{ top: 10, right: 10, bottom: 10, left: 10 }}>
               <Pie
                 data={pieData}
                 cx="50%"
                 cy="50%"
-                labelLine={false}
-                label={({ name, value, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
+                labelLine={true}
+                label={renderCustomLabel}
                 outerRadius={100}
                 fill="#8884d8"
                 dataKey="value"
@@ -44,16 +112,19 @@ function ExpenseVisualization({ expenses }) {
                   <Cell key={`cell-${index}`} fill={entry.color} />
                 ))}
               </Pie>
-              <Tooltip 
-                formatter={(value) => `$${value.toFixed(2)}`}
-                contentStyle={{ backgroundColor: '#ffffff', border: '1px solid #ddd', borderRadius: '4px' }}
-              />
-              <Legend 
-                wrapperStyle={{ paddingTop: '20px' }}
-                formatter={(value, entry) => `${entry.payload.name}: $${entry.payload.value.toFixed(2)}`}
-              />
+              <Tooltip content={<PieTooltip />} />
             </PieChart>
           </ResponsiveContainer>
+          
+          {/* Clean legend showing only category names */}
+          <div className="pie-chart-legend">
+            {pieData.map((item, index) => (
+              <div key={index} className="legend-item">
+                <span className="legend-color" style={{ backgroundColor: item.color }}></span>
+                <span className="legend-label">{item.name}</span>
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* Bar Chart */}
@@ -72,11 +143,7 @@ function ExpenseVisualization({ expenses }) {
               <YAxis 
                 label={{ value: 'Amount ($)', angle: -90, position: 'insideLeft' }}
               />
-              <Tooltip 
-                formatter={(value) => `$${value.toFixed(2)}`}
-                labelFormatter={(label) => `Expense: ${label}`}
-                contentStyle={{ backgroundColor: '#ffffff', border: '1px solid #ddd', borderRadius: '4px' }}
-              />
+              <Tooltip content={<BarTooltip />} />
               <Bar 
                 dataKey="amount" 
                 radius={[8, 8, 0, 0]}

@@ -281,3 +281,56 @@ export const getYearFromMonthString = (monthYearString) => {
   return parseInt(parts[1]) || new Date().getFullYear()
 }
 
+/**
+ * Aggregate income and expenses by month
+ * Returns monthly totals for both income and expenses, useful for comparison charts
+ * 
+ * @param {Array} transactions - Array of all transactions (both income and expense)
+ * @returns {Array} Monthly totals ready for line/bar chart
+ *   Structure: [
+ *     { month: "Jan 2026", income: 5000, expense: 3200, net: 1800 },
+ *     { month: "Feb 2026", income: 5000, expense: 2800, net: 2200 },
+ *     ...
+ *   ]
+ */
+export const getMonthlyIncomeVsExpense = (transactions) => {
+  if (!transactions || transactions.length === 0) {
+    return []
+  }
+
+  // Create a map of months with their income/expense totals
+  const monthMap = new Map()
+
+  transactions.forEach(transaction => {
+    const monthYear = formatMonthYear(transaction.dateISO)
+    
+    if (!monthMap.has(monthYear)) {
+      monthMap.set(monthYear, {
+        month: monthYear,
+        income: 0,
+        expense: 0
+      })
+    }
+
+    const monthData = monthMap.get(monthYear)
+    
+    if (transaction.type === 'income') {
+      monthData.income += transaction.amount
+    } else if (transaction.type === 'expense') {
+      monthData.expense += transaction.amount
+    }
+  })
+
+  // Convert to sorted array and calculate net
+  return Array.from(monthMap.values())
+    .sort((a, b) => {
+      const dateA = new Date(a.month)
+      const dateB = new Date(b.month)
+      return dateA - dateB
+    })
+    .map(item => ({
+      ...item,
+      net: item.income - item.expense
+    }))
+}
+

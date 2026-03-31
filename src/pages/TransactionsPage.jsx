@@ -8,6 +8,7 @@ import { getDefaultFilters, applyFilters } from '../utils/filterModel'
 import FiltersPanel from '../components/FiltersPanel'
 import ConfirmModal from '../components/ConfirmModal'
 import EditTransactionModal from '../components/EditTransactionModal'
+import ImportTransactions from '../components/ImportTransactions'
 import {
   createDeleteClickHandler,
   createConfirmDeleteHandler,
@@ -21,6 +22,7 @@ function TransactionsPage({ budgetState }) {
   const [filters, setFilters] = useState(getDefaultFilters())
   const [deleteModal, setDeleteModal] = useState({ isOpen: false, transactionId: null })
   const [editModal, setEditModal] = useState({ isOpen: false, transaction: null })
+  const [importModal, setImportModal] = useState(false)
   const transactions = budgetState.transactions
 
   // Apply filters and get filtered transactions
@@ -50,6 +52,16 @@ function TransactionsPage({ budgetState }) {
     return { success: false }
   }
 
+  const handleImport = (transactions) => {
+    if (budgetState.bulkImport) {
+      const result = budgetState.bulkImport(transactions)
+      if (result.success) {
+        // Optional: Show success message or reload filters
+        setFilters(getDefaultFilters())
+      }
+    }
+  }
+
   if (transactions.length === 0) {
     return (
       <div className="transactions-page">
@@ -62,7 +74,22 @@ function TransactionsPage({ budgetState }) {
         <div className="page-content">
           <div className="empty-state">
             <p>No transactions yet. Start by adding income or expenses on the home page.</p>
+            <button 
+              className="import-button"
+              onClick={() => setImportModal(true)}
+              title="Import transactions from CSV file"
+            >
+              📥 Or import transactions from CSV
+            </button>
           </div>
+          
+          {/* Import Modal for empty state */}
+          {importModal && (
+            <ImportTransactions
+              onImport={handleImport}
+              onClose={() => setImportModal(false)}
+            />
+          )}
         </div>
       </div>
     )
@@ -72,10 +99,21 @@ function TransactionsPage({ budgetState }) {
     <div className="transactions-page">
       <div className="page-header">
         <Link to="/" className="back-link">← Back to Home</Link>
-        <h1>All Transactions</h1>
-        <p className="page-description">
-          {transactions.length} total • {filteredTransactions.length} displayed
-        </p>
+        <div className="page-header-with-action">
+          <div>
+            <h1>All Transactions</h1>
+            <p className="page-description">
+              {transactions.length} total • {filteredTransactions.length} displayed
+            </p>
+          </div>
+          <button 
+            className="import-button"
+            onClick={() => setImportModal(true)}
+            title="Import transactions from CSV file"
+          >
+            📥 Import CSV
+          </button>
+        </div>
       </div>
 
       <div className="page-content">
@@ -164,7 +202,13 @@ function TransactionsPage({ budgetState }) {
         onClose={handleCloseEditModal}
         onSave={handleSaveEdit}
       />
-    </div>
+      {/* Import Transactions Modal */}
+      {importModal && (
+        <ImportTransactions
+          onImport={handleImport}
+          onClose={() => setImportModal(false)}
+        />
+      )}    </div>
   )
 }
 

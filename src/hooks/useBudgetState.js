@@ -64,12 +64,13 @@ export const useBudgetState = () => {
   /**
    * Update an existing transaction
    * Creates immutable copy of transactions array with updated item
+   * Sets lastUpdated timestamp to mark the transaction as edited
    * @param {string} id - Transaction ID
    * @param {string} description - Transaction description
    * @param {string} category - Transaction category
    * @param {number} amount - Transaction amount
    * @param {string} dateISO - ISO date string
-   * @returns {Object} Result object with success status
+   * @returns {Object} Result object with success status and updatedId
    */
   const updateTransaction = useCallback((id, description, category, amount, dateISO) => {
     const validation = validateTransaction(description, amount)
@@ -77,6 +78,7 @@ export const useBudgetState = () => {
       return { success: false, errors: validation.errors }
     }
 
+    const timestamp = Date.now()
     setTransactions(prevTransactions =>
       prevTransactions.map(transaction =>
         transaction.id === id
@@ -86,11 +88,12 @@ export const useBudgetState = () => {
               category: category || transaction.category,
               amount: Math.max(0, parseFloat(amount)),
               dateISO: dateISO || transaction.dateISO,
+              lastUpdated: timestamp
             }
           : transaction
       )
     )
-    return { success: true }
+    return { success: true, updatedId: id, timestamp }
   }, [])
 
   /**
@@ -145,6 +148,28 @@ export const useBudgetState = () => {
     return { success: true }
   }, [])
 
+  /**
+   * Bulk import multiple transactions from CSV
+   * @param {Array} transactionsToImport - Array of transaction objects with shape:
+   *   { type, description, category, amount, dateISO }
+   * @returns {Object} Result object with success status and imported count
+   */
+  const bulkImport = useCallback((transactionsToImport) => {
+    if (!Array.isArray(transactionsToImport) || transactionsToImport.length === 0) {
+      return { success: false, errors: ['No transactions provided'] }
+    }
+
+    setTransactions(prevTransactions => [
+      ...prevTransactions,
+      ...transactionsToImport
+    ])
+
+    return {
+      success: true,
+      importedCount: transactionsToImport.length
+    }
+  }, [])
+
   // Computed values derived from transactions
   const income = calculateTotalIncome(transactions)
   const expenses = filterTransactionsByType(transactions, 'expense')
@@ -176,6 +201,7 @@ export const useBudgetState = () => {
     deleteTransaction,
     clearTransactions,
     clearExpenses,
-    reset
+    reset,
+    bulkImport
   }
 }

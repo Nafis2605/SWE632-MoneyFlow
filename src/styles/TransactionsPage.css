@@ -11,6 +11,38 @@
   text-align: center;
 }
 
+.page-header-with-action {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--spacing-lg);
+  flex-wrap: wrap;
+}
+
+.page-header-with-action > div {
+  flex: 1;
+  min-width: 300px;
+}
+
+.import-button {
+  padding: var(--spacing-sm) var(--spacing-lg);
+  background-color: var(--color-primary);
+  color: white;
+  border: none;
+  border-radius: var(--border-radius);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  font-size: 0.95rem;
+}
+
+.import-button:hover {
+  opacity: 0.9;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(249, 65, 68, 0.2);
+}
+
 .back-link {
   display: inline-block;
   margin-bottom: var(--spacing-md);
@@ -235,11 +267,19 @@
   text-align: center;
   padding: 3rem 1rem;
   color: #6b7280;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-lg);
 }
 
 .empty-state p {
   margin: 0;
   font-size: 1rem;
+}
+
+.empty-state .import-button {
+  margin-top: var(--spacing-sm);
 }
 
 /* Responsive Design */

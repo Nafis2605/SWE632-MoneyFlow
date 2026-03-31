@@ -109,7 +109,7 @@ function TransactionForm({ onAddIncome, onAddExpense, isEmpty = false }) {
   // Labels based on transaction type
   const labels = {
     income: {
-      description: 'Income Description',
+      description: 'Income Source',
       descriptionPlaceholder: 'e.g., Salary, Freelance work, Bonus',
       button: 'Add Income'
     },
@@ -137,37 +137,57 @@ function TransactionForm({ onAddIncome, onAddExpense, isEmpty = false }) {
             <span>Step 3: Add</span>
           </div>
         )}
-        
-        {/* Toggle Buttons */}
-        <div className="transaction-toggle">
-          <button
-            type="button"
-            className={`toggle-btn ${type === 'income' ? 'active' : ''}`}
-            onClick={() => {
-              setType('income')
-              setCategory('')
-              setError(null)
-            }}
-            aria-pressed={type === 'income'}
-          >
-            Income
-          </button>
-          <button
-            type="button"
-            className={`toggle-btn ${type === 'expense' ? 'active' : ''}`}
-            onClick={() => {
-              setType('expense')
-              setCategory('')
-              setError(null)
-            }}
-            aria-pressed={type === 'expense'}
-          >
-            Expense
-          </button>
-        </div>
       </div>
 
-      <form className="transaction-form" onSubmit={handleSubmit}>
+      <form className={`transaction-form transaction-form--${type}`} onSubmit={handleSubmit}>
+        {/* Transaction Type Selector - Selectable Cards with Radio Semantics */}
+        <div className="form-group type-selector-group">
+          <label className="type-selector-label">
+            Transaction Type<span className="required" aria-label="required">*</span>
+          </label>
+          <div className="type-selector-buttons">
+            <div className="type-card">
+              <input
+                id="type-income"
+                type="radio"
+                name="transaction-type"
+                value="income"
+                checked={type === 'income'}
+                onChange={(e) => {
+                  setType(e.target.value)
+                  setCategory('')
+                  setError(null)
+                }}
+              />
+              <label htmlFor="type-income" className="type-card-label">
+                <svg className="type-card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M12 5v14M5 12h14" />
+                </svg>
+                <span className="type-card-text">Income</span>
+              </label>
+            </div>
+            <div className="type-card">
+              <input
+                id="type-expense"
+                type="radio"
+                name="transaction-type"
+                value="expense"
+                checked={type === 'expense'}
+                onChange={(e) => {
+                  setType(e.target.value)
+                  setCategory('')
+                  setError(null)
+                }}
+              />
+              <label htmlFor="type-expense" className="type-card-label">
+                <svg className="type-card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M5 12h14" />
+                </svg>
+                <span className="type-card-text">Expense</span>
+              </label>
+            </div>
+          </div>
+        </div>
         {/* Description Field */}
         <div className={`form-group ${descriptionError ? 'has-error' : ''}`}>
           <label htmlFor="transaction-description">
@@ -281,7 +301,7 @@ function TransactionForm({ onAddIncome, onAddExpense, isEmpty = false }) {
 
         <button 
           type="submit" 
-          className="btn btn-primary"
+          className={`btn btn-primary btn-${type}`}
           disabled={isDisabled}
           aria-disabled={isDisabled}
           title={getButtonTooltip()}

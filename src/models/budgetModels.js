@@ -13,6 +13,7 @@
  * @property {string} category - Category of the transaction (e.g., 'salary', 'groceries')
  * @property {number} amount - Transaction amount (in dollars)
  * @property {string} dateISO - ISO date string (YYYY-MM-DD) to avoid timezone issues
+ * @property {number|null} lastUpdated - Unix timestamp of last edit (null if not edited, only set on updates)
  */
 
 /**
@@ -54,7 +55,8 @@ export const createTransaction = (type, description, category, amount, dateISO) 
     description: description.trim(),
     category: category.toLowerCase(),
     amount: Math.max(0, parseFloat(amount)),
-    dateISO: isoDate
+    dateISO: isoDate,
+    lastUpdated: null
   }
 }
 

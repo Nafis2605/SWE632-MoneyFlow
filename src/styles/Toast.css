@@ -1,0 +1,86 @@
+/**
+ * Toast Notification Styles
+ * Lightweight, non-blocking feedback messages
+ */
+
+.toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  min-height: 48px;
+  max-width: 400px;
+  padding: 12px 16px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 9999;
+  animation: slideInUp 0.3s ease-out, slideOutDown 0.3s ease-in 2.7s forwards;
+}
+
+@keyframes slideInUp {
+  from {
+    transform: translateY(100px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOutDown {
+  from {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(100px);
+    opacity: 0;
+  }
+}
+
+.toast.toast-success {
+  background-color: #d1fae5;
+  border: 1px solid #6ee7b7;
+  color: #047857;
+}
+
+.toast.toast-error {
+  background-color: #fee2e2;
+  border: 1px solid #fca5a5;
+  color: #dc2626;
+}
+
+.toast.toast-info {
+  background-color: #dbeafe;
+  border: 1px solid #93c5fd;
+  color: #0284c7;
+}
+
+.toast-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.toast-icon {
+  font-weight: 700;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+.toast-message {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+/* Responsive Design */
+@media (max-width: 480px) {
+  .toast {
+    bottom: 16px;
+    right: 16px;
+    left: 16px;
+    max-width: none;
+  }
+}

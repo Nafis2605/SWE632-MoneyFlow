@@ -18,8 +18,14 @@ function BudgetSummary({ income, totalExpenses, remainingBudget, isEmpty = false
   }
 
   return (
-    <section className={`budget-summary-section ${isEmpty ? 'empty-state' : ''}`}>
+    <section className="budget-summary-section">
       <h2>Budget Summary</h2>
+      
+      {isEmpty && (
+        <div className="helper-text">
+          <p>💡 Your summary will update once you add transactions</p>
+        </div>
+      )}
       
       <div className="summary-grid">
         <div className="summary-card">
@@ -39,12 +45,6 @@ function BudgetSummary({ income, totalExpenses, remainingBudget, isEmpty = false
           </p>
         </div>
       </div>
-
-      {isEmpty && (
-        <div className="empty-state-message">
-          <p>Your summary will update once you add transactions</p>
-        </div>
-      )}
 
       {/* Progress Bar */}
       <div className="budget-visualization">

@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import ExpenseVisualization from '../components/ExpenseVisualization'
 import MonthlyCategoryTrends from '../components/MonthlyCategoryTrends'
 import BudgetSummary from '../components/BudgetSummary'
+import IncomeVsExpenseChart from '../components/IncomeVsExpenseChart'
 import FiltersPanel from '../components/FiltersPanel'
 import TransactionListWithActions from '../components/TransactionListWithActions'
 import { getDefaultFilters, applyFilters } from '../utils/filterModel'
@@ -50,6 +51,16 @@ function DashboardPage({ budgetState }) {
               income={filteredIncome}
               totalExpenses={filteredTotalExpenses}
               remainingBudget={filteredRemainingBudget}
+            />
+          </div>
+        </div>
+
+        {/* Income vs Expense Comparison */}
+        <div className="dashboard-section income-comparison-section">
+          <div className="section-wrapper">
+            <IncomeVsExpenseChart
+              transactions={filteredTransactions}
+              showNetSavings={true}
             />
           </div>
         </div>

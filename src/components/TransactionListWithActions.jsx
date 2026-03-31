@@ -1,7 +1,8 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import ConfirmModal from './ConfirmModal'
 import EditTransactionModal from './EditTransactionModal'
-import { formatDate } from '../utils/date'
+import Toast from './Toast'
+import { formatDate, formatTimeAgo } from '../utils/date'
 import { getCategoryLabel } from '../utils/categories'
 import '../styles/TransactionListWithActions.css'
 import {
@@ -35,6 +36,8 @@ function TransactionListWithActions({
 }) {
   const [deleteModal, setDeleteModal] = useState({ isOpen: false, transactionId: null })
   const [editModal, setEditModal] = useState({ isOpen: false, transaction: null })
+  const [toast, setToast] = useState({ show: false, message: '', type: 'success' })
+  const [highlightedId, setHighlightedId] = useState(null)
 
   // Filter transactions if needed
   let displayTransactions = [...transactions]
@@ -60,7 +63,16 @@ function TransactionListWithActions({
   const handleCloseEditModal = createCloseEditModalHandler(setEditModal)
   const handleSaveEdit = (id, description, category, amount, date) => {
     if (onUpdate) {
-      return onUpdate(id, description, category, amount, date)
+      const result = onUpdate(id, description, category, amount, date)
+      if (result && result.success) {
+        // Show success toast
+        setToast({ show: true, message: 'Transaction updated successfully', type: 'success' })
+        
+        // Highlight the updated transaction for 1.5 seconds
+        setHighlightedId(id)
+        setTimeout(() => setHighlightedId(null), 1500)
+      }
+      return result
     }
     return { success: false }
   }
@@ -78,7 +90,10 @@ function TransactionListWithActions({
       <div className="transaction-list-with-actions">
         <ul className="transactions-list">
           {displayTransactions.map((transaction) => (
-            <li key={transaction.id} className="transaction-item">
+            <li 
+              key={transaction.id} 
+              className={`transaction-item ${highlightedId === transaction.id ? 'transaction-highlighted' : ''}`}
+            >
               <div className="transaction-main">
                 <div className="transaction-header">
                   <span className="transaction-title">{transaction.description}</span>
@@ -88,6 +103,11 @@ function TransactionListWithActions({
                   <span className="transaction-category">
                     {getCategoryLabel(transaction.category, transaction.type)}
                   </span>
+                  {transaction.lastUpdated && (
+                    <span className="transaction-edited-badge" title={`Updated: ${new Date(transaction.lastUpdated).toLocaleString()}`}>
+                      Edited
+                    </span>
+                  )}
                 </div>
                 <span className="transaction-date">{formatDate(transaction.dateISO)}</span>
               </div>
@@ -150,6 +170,16 @@ function TransactionListWithActions({
         onClose={handleCloseEditModal}
         onSave={handleSaveEdit}
       />
+
+      {/* Success Toast Notification */}
+      {toast.show && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          duration={3000}
+          onDismiss={() => setToast({ ...toast, show: false })}
+        />
+      )}
     </>
   )
 }

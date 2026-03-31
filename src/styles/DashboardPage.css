@@ -15,6 +15,11 @@
   margin-bottom: var(--spacing-xl);
 }
 
+.income-comparison-section {
+  margin-bottom: var(--spacing-xl);
+  min-height: auto;
+}
+
 .visualization-section {
   min-height: 400px;
 }

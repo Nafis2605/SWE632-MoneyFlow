@@ -1,0 +1,358 @@
+/**
+ * IncomeVsExpenseChart Styles
+ * 
+ * Styling for the income vs expense comparison visualization
+ * Includes chart, tooltips, summary cards, and analysis sections
+ */
+
+.income-vs-expense-section {
+  background: linear-gradient(135deg, #ffffff 0%, #f9fafb 100%);
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 28px;
+  margin-bottom: 32px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+}
+
+.income-vs-expense-section:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-color: #d1d5db;
+}
+
+.income-vs-expense-section.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+  background: linear-gradient(135deg, #f9fafb 0%, #ffffff 100%);
+}
+
+.income-vs-expense-section.empty-state .empty-message {
+  color: #9ca3af;
+  font-size: 1rem;
+  margin-top: 12px;
+}
+
+/* Section Header */
+.income-vs-expense-section .section-header {
+  margin-bottom: 24px;
+}
+
+.income-vs-expense-section h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0 0 8px 0;
+  letter-spacing: -0.3px;
+}
+
+.income-vs-expense-section .section-description {
+  font-size: 0.9rem;
+  color: #6b7280;
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* Chart Container */
+.income-vs-expense-section .chart-container {
+  background: white;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 24px;
+  border: 1px solid #f0f0f0;
+  overflow-x: auto;
+}
+
+/* Custom Tooltip Styling */
+.income-expense-tooltip {
+  background: white;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  font-size: 0.85rem;
+  z-index: 1000;
+  min-width: 200px;
+}
+
+.income-expense-tooltip .tooltip-month {
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0 0 8px 0;
+  font-size: 0.95rem;
+}
+
+.income-expense-tooltip .tooltip-income,
+.income-expense-tooltip .tooltip-expense {
+  margin: 4px 0;
+  color: #4b5563;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.income-expense-tooltip .tooltip-income {
+  color: #059669;
+}
+
+.income-expense-tooltip .tooltip-expense {
+  color: #dc2626;
+}
+
+.income-expense-tooltip .tooltip-divider {
+  border: none;
+  border-top: 1px solid #e5e7eb;
+  margin: 8px 0;
+}
+
+.income-expense-tooltip .tooltip-net {
+  margin: 4px 0;
+  font-weight: 600;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.income-expense-tooltip .tooltip-net.positive {
+  color: #059669;
+}
+
+.income-expense-tooltip .tooltip-net.negative {
+  color: #dc2626;
+}
+
+.income-expense-tooltip .amount {
+  font-weight: 700;
+  font-family: 'Monaco', 'Courier New', monospace;
+  font-size: 0.9rem;
+}
+
+/* Summary Cards */
+.income-vs-expense-section .chart-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.income-vs-expense-section .summary-card {
+  background: white;
+  border-radius: 8px;
+  padding: 16px;
+  border: 1px solid #e5e7eb;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: all 0.2s ease;
+}
+
+.income-vs-expense-section .summary-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.income-vs-expense-section .summary-card.income-card {
+  border-left: 4px solid #10b981;
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.05) 0%, rgba(16, 185, 129, 0.02) 100%);
+}
+
+.income-vs-expense-section .summary-card.expense-card {
+  border-left: 4px solid #ef4444;
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.05) 0%, rgba(239, 68, 68, 0.02) 100%);
+}
+
+.income-vs-expense-section .summary-card.net-card {
+  border-left: 4px solid #3b82f6;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(59, 130, 246, 0.02) 100%);
+}
+
+.income-vs-expense-section .card-icon {
+  font-size: 1.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 40px;
+}
+
+.income-vs-expense-section .card-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.income-vs-expense-section .card-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #6b7280;
+  font-weight: 600;
+  margin: 0;
+}
+
+.income-vs-expense-section .card-value {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 4px 0 0 0;
+  font-family: 'Monaco', 'Courier New', monospace;
+}
+
+.income-vs-expense-section .card-value.positive {
+  color: #10b981;
+}
+
+.income-vs-expense-section .card-value.negative {
+  color: #ef4444;
+}
+
+/* Analysis Section */
+.income-vs-expense-section .chart-analysis {
+  background: linear-gradient(135deg, #f0f9ff 0%, #f3e8ff 100%);
+  border: 1px solid #dbeafe;
+  border-radius: 8px;
+  padding: 16px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+.income-vs-expense-section .analysis-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(219, 234, 254, 0.5);
+}
+
+.income-vs-expense-section .analysis-item:last-child {
+  border-bottom: none;
+}
+
+.income-vs-expense-section .analysis-label {
+  font-size: 0.85rem;
+  color: #475569;
+  font-weight: 500;
+}
+
+.income-vs-expense-section .analysis-value {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #1e293b;
+  font-family: 'Monaco', 'Courier New', monospace;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .income-vs-expense-section {
+    padding: 20px 16px;
+    margin-bottom: 24px;
+  }
+
+  .income-vs-expense-section h2 {
+    font-size: 1.25rem;
+  }
+
+  .income-vs-expense-section .section-description {
+    font-size: 0.85rem;
+  }
+
+  .income-vs-expense-section .chart-container {
+    padding: 12px;
+    margin-bottom: 16px;
+  }
+
+  .income-vs-expense-section .chart-summary {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .income-vs-expense-section .chart-analysis {
+    gap: 8px;
+    padding: 12px;
+  }
+
+  .income-vs-expense-section .analysis-item {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 6px 0;
+  }
+
+  .income-vs-expense-section .summary-card {
+    padding: 12px;
+    gap: 10px;
+  }
+
+  .income-vs-expense-section .card-icon {
+    font-size: 1.5rem;
+    min-width: 32px;
+  }
+
+  .income-vs-expense-section .card-value {
+    font-size: 1.1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .income-vs-expense-section {
+    padding: 16px 12px;
+    border-radius: 8px;
+  }
+
+  .income-vs-expense-section h2 {
+    font-size: 1.1rem;
+  }
+
+  .income-vs-expense-section .chart-container {
+    min-height: 280px;
+  }
+
+  .income-vs-expense-section .card-value {
+    font-size: 1rem;
+  }
+
+  .income-expense-tooltip {
+    font-size: 0.8rem;
+    padding: 10px;
+    min-width: 180px;
+  }
+}
+
+/* Chart Legend Styling */
+.income-vs-expense-section .recharts-legend {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 24px;
+  margin-top: 16px;
+}
+
+.income-vs-expense-section .recharts-legend-wrapper {
+  margin-top: 20px;
+}
+
+.income-vs-expense-section .recharts-legend-item {
+  color: #4b5563;
+  font-size: 0.9rem;
+}
+
+.income-vs-expense-section .recharts-legend-item span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Print Styles */
+@media print {
+  .income-vs-expense-section {
+    page-break-inside: avoid;
+    box-shadow: none;
+    border: 1px solid #d1d5db;
+  }
+
+  .income-vs-expense-section .chart-container {
+    background: white;
+  }
+}

@@ -52,49 +52,129 @@
   margin: 0 0.25rem;
 }
 
-/* Toggle Buttons */
-.transaction-toggle {
-  display: flex;
-  gap: 0.5rem;
-  background: #f3f4f6;
-  padding: 0.375rem;
-  border-radius: var(--border-radius);
-  width: fit-content;
-  border: 1px solid #e5e7eb;
+/* Toggle Buttons - REMOVED in favor of explicit selectable cards */
+/* Use type-selector styles below instead */
+
+/* Transaction Type Selector - Modern Selectable Cards */
+.transaction-form .type-selector-group {
+  margin-bottom: 1.5rem;
+  margin-top: 0;
 }
 
-.toggle-btn {
-  flex: 1;
-  padding: 0.625rem 1.25rem;
-  border: none;
-  background: transparent;
-  color: #6b7280;
+.type-selector-label {
+  display: block;
   font-size: 0.95rem;
   font-weight: 500;
-  cursor: pointer;
-  border-radius: calc(var(--border-radius) - 2px);
-  transition: all 0.2s ease;
-  white-space: nowrap;
-  min-width: 100px;
-  border: 1px solid transparent;
-}
-
-.toggle-btn:hover:not(.active) {
   color: var(--color-dark);
-  background: #e5e7eb;
+  margin-bottom: 0.75rem;
 }
 
-.toggle-btn.active {
-  background: var(--color-primary);
-  color: var(--color-light);
-  border-color: var(--color-primary);
-  box-shadow: 0 2px 8px rgba(83, 103, 171, 0.3);
+.type-selector-label .required {
+  color: var(--color-error);
+  margin-left: 0.25rem;
   font-weight: 600;
 }
 
-.toggle-btn:focus-visible {
+.type-selector-buttons {
+  display: flex;
+  gap: 1rem;
+  align-items: stretch;
+}
+
+/* Hidden native radio inputs */
+.type-card input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+/* Card Container */
+.type-card {
+  flex: 1;
+  position: relative;
+  min-height: 0;
+}
+
+/* Card Label (styled as selectable card) */
+.type-card-label {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.875rem 1.25rem;
+  border: 2px solid #e5e7eb;
+  border-radius: calc(var(--border-radius) - 2px);
+  background: var(--color-light);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+  font-weight: 500;
+  color: #6b7280;
+}
+
+.type-card-label:hover {
+  border-color: #d1d5db;
+  background: #f9fafb;
+}
+
+/* Card Icon */
+.type-card-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  color: #9ca3af;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.type-card-text {
+  font-size: 0.95rem;
+}
+
+/* Income Card - Selected State */
+.type-card input[value="income"]:checked + .type-card-label {
+  border-color: #10b981;
+  background: rgba(16, 185, 129, 0.05);
+  color: #047857;
+  font-weight: 600;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+}
+
+.type-card input[value="income"]:checked + .type-card-label .type-card-icon {
+  color: #10b981;
+}
+
+/* Expense Card - Selected State */
+.type-card input[value="expense"]:checked + .type-card-label {
+  border-color: #ef4444;
+  background: rgba(239, 68, 68, 0.05);
+  color: #991b1b;
+  font-weight: 600;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+.type-card input[value="expense"]:checked + .type-card-label .type-card-icon {
+  color: #ef4444;
+}
+
+/* Focus state for accessibility */
+.type-card input:focus-visible + .type-card-label {
   outline: 2px solid var(--color-primary);
   outline-offset: 2px;
+}
+
+/* Form container color indicator */
+.transaction-form {
+  border-top: 4px solid #d1d5db;
+  transition: border-color 0.25s ease;
+}
+
+.transaction-form--income {
+  border-top-color: #10b981;
+}
+
+.transaction-form--expense {
+  border-top-color: #ef4444;
 }
 
 /* Form Group */
@@ -274,6 +354,57 @@
   outline-offset: 2px;
 }
 
+/* Color-Coded Button Variants */
+.transaction-form .btn-income {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+  box-shadow: 0 4px 6px rgba(16, 185, 129, 0.2);
+}
+
+.transaction-form .btn-income:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(16, 185, 129, 0.3);
+}
+
+.transaction-form .btn-income:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(16, 185, 129, 0.2);
+}
+
+.transaction-form .btn-income:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+  color: #047857;
+  box-shadow: 0 2px 4px rgba(16, 185, 129, 0.1);
+}
+
+.transaction-form .btn-expense {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  color: white;
+  box-shadow: 0 4px 6px rgba(239, 68, 68, 0.2);
+}
+
+.transaction-form .btn-expense:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(239, 68, 68, 0.3);
+}
+
+.transaction-form .btn-expense:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(239, 68, 68, 0.2);
+}
+
+.transaction-form .btn-expense:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  background: linear-gradient(135deg, #fee2e2, #fecaca);
+  color: #991b1b;
+  box-shadow: 0 2px 4px rgba(239, 68, 68, 0.1);
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
   .transaction-form-section {
@@ -284,15 +415,13 @@
     font-size: 1.25rem;
   }
 
-  .transaction-toggle {
-    flex-direction: row;
-    gap: 0.5rem;
+  .type-selector-buttons {
+    flex-direction: column;
+    gap: 0.75rem;
   }
 
-  .toggle-btn {
-    flex: 1;
-    min-width: auto;
-    padding: 0.5rem 1rem;
+  .type-card-label {
+    padding: 0.75rem 1rem;
   }
 
   .form-hint {

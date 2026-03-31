@@ -154,6 +154,41 @@
   font-size: 1rem;
 }
 
+/* "Edited" Badge */
+.transaction-list-with-actions .transaction-edited-badge {
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 0.2rem 0.5rem;
+  border-radius: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  background: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fcd34d;
+  white-space: nowrap;
+  cursor: help;
+}
+
+/* Highlight Animation for Recently Edited */
+@keyframes editHighlight {
+  0% {
+    animation-timing-function: ease-in;
+    background-color: #fef9e7;
+  }
+  50% {
+    animation-timing-function: ease-out;
+    background-color: #ffece3;
+  }
+  100% {
+    background-color: transparent;
+  }
+}
+
+.transaction-list-with-actions .transaction-item.transaction-highlighted {
+  animation: editHighlight 1.5s ease-in-out forwards;
+  border-color: #fb923c;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
   .transaction-list-with-actions .transaction-item {

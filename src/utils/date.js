@@ -148,3 +148,41 @@ export const getAvailableMonths = (isoDates, year) => {
   )]
   return months.sort((a, b) => a - b)
 }
+
+/**
+ * Format a Unix timestamp as relative time (e.g., "2 minutes ago")
+ * @param {number} timestamp - Unix timestamp in milliseconds (from Date.now())
+ * @returns {string} Human-readable relative time
+ */
+export const formatTimeAgo = (timestamp) => {
+  if (!timestamp) return ''
+  
+  const now = Date.now()
+  const seconds = Math.floor((now - timestamp) / 1000)
+  
+  if (seconds < 60) {
+    return 'just now'
+  }
+  
+  const minutes = Math.floor(seconds / 60)
+  if (minutes < 60) {
+    return `${minutes} minute${minutes > 1 ? 's' : ''} ago`
+  }
+  
+  const hours = Math.floor(minutes / 60)
+  if (hours < 24) {
+    return `${hours} hour${hours > 1 ? 's' : ''} ago`
+  }
+  
+  const days = Math.floor(hours / 24)
+  if (days < 7) {
+    return `${days} day${days > 1 ? 's' : ''} ago`
+  }
+  
+  // For older timestamps, show full date
+  return new Date(timestamp).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric'
+  })
+}

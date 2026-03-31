@@ -292,7 +292,7 @@ function MonthlyCategoryTrends({ expenses }) {
                 />
                 <span
                   className="category-color-dot"
-                  style={{ backgroundColor: getCategoryColor(category.value) }}
+                  style={{ backgroundColor: getCategoryColor(category.value, 'expense') }}
                 />
                 <span className="category-label">{category.label}</span>
               </label>
@@ -332,8 +332,15 @@ function MonthlyCategoryTrends({ expenses }) {
                 labelFormatter={(label) => `Month: ${label}`}
                 contentStyle={{
                   backgroundColor: '#ffffff',
-                  border: '1px solid #ddd',
-                  borderRadius: '4px'
+                  border: '2px solid #ddd',
+                  borderRadius: '6px',
+                  padding: '10px 12px',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+                }}
+                labelStyle={{
+                  color: '#333',
+                  fontWeight: 600,
+                  marginBottom: '4px'
                 }}
               />
               <Legend
@@ -345,16 +352,29 @@ function MonthlyCategoryTrends({ expenses }) {
               {displayedCategories.map((categoryLabel, index) => (
                 <Line
                   key={`line-${categoryLabel}`}
-                  type="monotone"
+                  type="linear"
                   dataKey={categoryLabel}
                   stroke={getCategoryColor(
                     availableCategories.find(
                       cat => getCategoryLabel(cat.value, 'expense') === categoryLabel
-                    )?.value || 'other'
+                    )?.value || 'other',
+                    'expense'
                   )}
-                  strokeWidth={2}
-                  dot={{ r: 4 }}
-                  activeDot={{ r: 6 }}
+                  strokeWidth={1.5}
+                  dot={{ 
+                    r: 6,
+                    fill: getCategoryColor(
+                      availableCategories.find(
+                        cat => getCategoryLabel(cat.value, 'expense') === categoryLabel
+                      )?.value || 'other',
+                      'expense'
+                    ),
+                    strokeWidth: 0
+                  }}
+                  activeDot={{ 
+                    r: 8,
+                    strokeWidth: 0
+                  }}
                   isAnimationActive={true}
                 />
               ))}
