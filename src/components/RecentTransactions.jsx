@@ -62,8 +62,8 @@ function RecentTransactions({ transactions, onDeleteTransaction, onUpdateTransac
                   <span className="transaction-category">
                     {getCategoryLabel(transaction.category, transaction.type)}
                   </span>
+                  <span className="transaction-date">{formatDate(transaction.dateISO)}</span>
                 </div>
-                <span className="transaction-date">{formatDate(transaction.dateISO)}</span>
               </div>
               <div className={`transaction-amount transaction-amount-${transaction.type}`}>
                 <span className="amount-sign">{transaction.type === 'income' ? '+' : '−'}</span>

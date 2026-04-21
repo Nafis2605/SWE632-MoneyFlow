@@ -129,12 +129,15 @@ function TransactionForm({ onAddIncome, onAddExpense, isEmpty = false }) {
         <h2>Add Transaction</h2>
         
         {isEmpty && (
-          <div className="form-hint">
-            <span>Step 1: Choose type</span>
-            <span>•</span>
-            <span>Step 2: Fill details</span>
-            <span>•</span>
-            <span>Step 3: Add</span>
+          <div className="form-intro">
+            <p className="form-intro-text">Start by adding your first transaction.</p>
+            <div className="form-hint">
+              <span>1. Choose type</span>
+              <span>•</span>
+              <span>2. Fill details</span>
+              <span>•</span>
+              <span>3. Add</span>
+            </div>
           </div>
         )}
       </div>

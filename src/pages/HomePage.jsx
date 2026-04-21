@@ -90,18 +90,20 @@ function HomePage({ budgetState }) {
         <p className="page-description">
           Manage your income and expenses to track your budget
         </p>
-        <button 
-          className="import-button-home"
-          onClick={() => setImportModal(true)}
-          title="Import transactions from CSV file"
-        >
-          📥 Import Transactions
-        </button>
+        <div className="page-actions">
+          <button 
+            className="import-button-home import-button-secondary"
+            onClick={() => setImportModal(true)}
+            title="Import transactions from CSV file"
+          >
+            📥 Import Transactions
+          </button>
+        </div>
       </div>
 
       {/* Time Filter Controls */}
       {hasTransactions && (
-        <div className="time-filter-section">
+        <div className="time-filter-section time-filter-section-page-level">
           <div className="time-filter-container">
             <div className="time-filter-left">
               <label htmlFor="month-year-select" className="time-filter-label">Select Month:</label>
@@ -144,9 +146,6 @@ function HomePage({ budgetState }) {
               </button>
             </div>
           </div>
-          <div className="time-filter-status">
-            Viewing: <strong>{displayDate}</strong>
-          </div>
         </div>
       )}
 
@@ -171,6 +170,53 @@ function HomePage({ budgetState }) {
 
         {/* Right Column: Budget Summary */}
         <section className="section-column content-column">
+          {/* Time Filter Controls - Grouped with Budget Summary */}
+          {hasTransactions && (
+            <div className="time-filter-section time-filter-section-inline">
+              <div className="time-filter-container">
+                <div className="time-filter-left">
+                  <label htmlFor="month-year-select" className="time-filter-label">Select Month:</label>
+                  <select
+                    id="month-year-select"
+                    className="month-year-select"
+                    value={`${selectedYear}-${String(selectedMonth).padStart(2, '0')}`}
+                    onChange={(e) => {
+                      const [year, month] = e.target.value.split('-')
+                      setSelectedYear(parseInt(year))
+                      setSelectedMonth(parseInt(month))
+                    }}
+                  >
+                    {getAvailableMonths().map((monthYear) => {
+                      const [year, month] = monthYear.split('-')
+                      const m = parseInt(month)
+                      return (
+                        <option key={monthYear} value={monthYear}>
+                          {monthNames[m - 1]} {year}
+                        </option>
+                      )
+                    })}
+                  </select>
+                </div>
+
+                <div className="time-filter-right">
+                  <button
+                    className={`quick-filter-btn ${isCurrentMonth ? 'active' : ''}`}
+                    onClick={handleThisMonth}
+                    type="button"
+                  >
+                    This Month
+                  </button>
+                  <button
+                    className="quick-filter-btn"
+                    onClick={handleLastMonth}
+                    type="button"
+                  >
+                    Last Month
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
           <div className="section-wrapper">
             <BudgetSummary
               income={monthlyIncome}

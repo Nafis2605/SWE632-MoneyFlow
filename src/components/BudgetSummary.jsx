@@ -60,7 +60,20 @@ function BudgetSummary({ income, totalExpenses, remainingBudget, isEmpty = false
               backgroundColor: getProgressBarColor()
             }}
           />
+          {percentage > 100 && (
+            <div
+              className="progress-bar-overflow"
+              style={{
+                width: `${Math.min(percentage - 100, 100)}%`,
+              }}
+            />
+          )}
         </div>
+        {percentage > 100 && (
+          <div className="overflow-indicator">
+            <span className="overflow-amount">+{(percentage - 100).toFixed(1)}%</span>
+          </div>
+        )}
         {overBudget && (
           <p className="warning-text">
             ⚠️ You've exceeded your budget by ${overAmount.toFixed(2)}

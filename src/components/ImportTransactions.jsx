@@ -153,7 +153,7 @@ function ImportTransactions({ onImport, onClose }) {
                     <div className="summary-number">{parseResult.summary.validCount}</div>
                     <div className="summary-label">Valid Transactions</div>
                   </div>
-                  <div className="summary-card invalid">
+                  <div className={`summary-card invalid ${parseResult.summary.invalidCount === 0 ? 'zero-state' : ''}`}>
                     <div className="summary-number">{parseResult.summary.invalidCount}</div>
                     <div className="summary-label">Invalid Rows</div>
                   </div>

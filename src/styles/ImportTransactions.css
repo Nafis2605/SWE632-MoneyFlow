@@ -272,6 +272,20 @@
   border-color: #ef4444;
 }
 
+/* Zero-state styling for invalid card when there are no errors */
+.summary-card.invalid.zero-state {
+  background-color: #f3f4f6;
+  border-color: #d1d5db;
+}
+
+.summary-card.invalid.zero-state .summary-number {
+  color: #9ca3af;
+}
+
+.summary-card.invalid.zero-state .summary-label {
+  color: #6b7280;
+}
+
 .summary-number {
   font-size: 2rem;
   font-weight: 700;

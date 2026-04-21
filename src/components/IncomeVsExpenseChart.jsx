@@ -7,8 +7,8 @@
  */
 
 import {
-  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
-  ResponsiveContainer, ReferenceLine
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
+  ResponsiveContainer, ReferenceLine, Cell
 } from 'recharts'
 import { getMonthlyIncomeVsExpense } from '../utils/monthlyTrends'
 import '../styles/IncomeVsExpenseChart.css'
@@ -68,9 +68,9 @@ function IncomeVsExpenseChart({ transactions, showNetSavings = true }) {
         <>
           <div className="chart-container">
             <ResponsiveContainer width="100%" height={350}>
-              <LineChart
+              <BarChart
                 data={chartData}
-                margin={{ top: 5, right: 30, left: 0, bottom: 5 }}
+                margin={{ top: 20, right: 30, left: 0, bottom: 5 }}
               >
                 <CartesianGrid 
                   strokeDasharray="3 3" 
@@ -81,9 +81,6 @@ function IncomeVsExpenseChart({ transactions, showNetSavings = true }) {
                   dataKey="month"
                   tick={{ fontSize: 12 }}
                   stroke="#666"
-                  angle={-45}
-                  textAnchor="end"
-                  height={80}
                 />
                 <YAxis
                   label={{
@@ -95,10 +92,6 @@ function IncomeVsExpenseChart({ transactions, showNetSavings = true }) {
                   tickFormatter={(value) => `$${(value / 1000).toFixed(0)}k`}
                 />
                 <Tooltip content={<CustomTooltip />} />
-                <Legend
-                  wrapperStyle={{ paddingTop: '20px' }}
-                  height={36}
-                />
 
                 {/* Reference line at 0 for visual reference */}
                 <ReferenceLine
@@ -108,45 +101,32 @@ function IncomeVsExpenseChart({ transactions, showNetSavings = true }) {
                   opacity={0.5}
                 />
 
-                {/* Income Line - Green */}
-                <Line
-                  type="linear"
+                {/* Income Bar - Green */}
+                <Bar
                   dataKey="income"
-                  stroke="#10b981"
-                  strokeWidth={2.5}
-                  dot={{ r: 5, fill: '#10b981', strokeWidth: 0 }}
-                  activeDot={{ r: 7, fill: '#10b981', strokeWidth: 0 }}
+                  fill="#10b981"
+                  radius={[4, 4, 0, 0]}
                   name="Income"
-                  isAnimationActive={true}
                 />
 
-                {/* Expense Line - Red */}
-                <Line
-                  type="linear"
+                {/* Expense Bar - Red */}
+                <Bar
                   dataKey="expense"
-                  stroke="#ef4444"
-                  strokeWidth={2.5}
-                  dot={{ r: 5, fill: '#ef4444', strokeWidth: 0 }}
-                  activeDot={{ r: 7, fill: '#ef4444', strokeWidth: 0 }}
+                  fill="#ef4444"
+                  radius={[4, 4, 0, 0]}
                   name="Expense"
-                  isAnimationActive={true}
                 />
 
-                {/* Net Savings Line - Blue (optional) */}
+                {/* Net Savings Bar - Blue (optional) */}
                 {showNetSavings && (
-                  <Line
-                    type="linear"
+                  <Bar
                     dataKey="net"
-                    stroke="#3b82f6"
-                    strokeWidth={2.5}
-                    strokeDasharray="5 5"
-                    dot={{ r: 5, fill: '#3b82f6', strokeWidth: 0 }}
-                    activeDot={{ r: 7, fill: '#3b82f6', strokeWidth: 0 }}
+                    fill="#3b82f6"
+                    radius={[4, 4, 0, 0]}
                     name="Net Savings"
-                    isAnimationActive={true}
                   />
                 )}
-              </LineChart>
+              </BarChart>
             </ResponsiveContainer>
           </div>
 
